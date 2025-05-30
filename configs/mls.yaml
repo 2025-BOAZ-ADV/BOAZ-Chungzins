@@ -1,0 +1,26 @@
+defaults:
+  - dataset: dataset
+  - model: mls
+  - trainer: default
+
+dataset:
+  path: "/data/ICBHI2017"
+  batch_size: 128
+  num_workers: 4
+
+model:
+  name: "mls"
+  backbone: "resnet18"
+  dim_g: 512
+  dim_z: 256
+  K: 512
+  m: 0.999
+  T: 0.2
+  k_pos: 20
+  lambda_mls: 0.5
+
+trainer:
+  epochs: 200
+  lr: 1e-3
+  weight_decay: 1e-4
+  scheduler: "cosine"

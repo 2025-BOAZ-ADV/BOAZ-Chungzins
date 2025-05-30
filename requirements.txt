@@ -1,0 +1,8 @@
+torch>=1.12
+torchaudio
+torchvision
+hydra-core
+pyyaml
+wandb
+scikit-learn
+pytest
