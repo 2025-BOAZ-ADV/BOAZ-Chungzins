@@ -1,0 +1,61 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Virtual Environment
+.env
+.venv
+venv/
+ENV/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Project specific
+wandb/
+wandb_logs/
+data/processed/
+checkpoints/
+*.ipynb_checkpoints
+*.bak
+*.new
+data/raw/
+data/backup/
+data/metadata/
+experiments/
+eda_results/
+models/__pycache__/
+trainers/__pycache__/
+utils/__pycache__/
+config/__pycache__/
+data/__pycache__/
+scripts/__pycache__/
+# 현석_New_Moco_0530 (1).ipynb
+
+# Logs
+*.log
+
+# Local development
+.DS_Store
