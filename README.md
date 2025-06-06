@@ -54,36 +54,55 @@ ADV/
 
 ## 실행 방법
 
-1. **필수 패키지 설치**
-   Python 3.8 이상 환경에서 아래 명령어로 필요한 패키지를 설치하세요.
+### 1. 환경 설정
 
-   ```bash
-   pip install -r requirements.txt
-   ```
-   또는, `.env` 파일의 내용을 requirements.txt로 복사 후 설치:
-   ```bash
-   pip install -r .env
-   ```
+**가상환경 생성 및 활성화**
+```bash
+# 가상환경 생성
+python -m venv .venv
 
-2. **데이터 준비**
-   `data/raw/` 폴더에 필요한 데이터를 넣으세요. (데이터 파일은 직접 준비해야 하며, git에는 포함되지 않습니다.)
+# 가상환경 활성화 (Windows)
+.venv\Scripts\activate
 
-3. **프로젝트 실행**
-   예시) 파인튜닝 학습 실행
-   ```bash
-   python scripts/train_finetune.py
-   ```
-   예시) SSL 학습 실행
-   ```bash
-   python scripts/train_ssl.py
-   ```
-   예시) EDA 실행
-   ```bash
-   python scripts/run_eda.py
-   ```
+# 가상환경 활성화 (Linux/Mac)
+source .venv/bin/activate
+```
 
-4. **실험 결과 확인**
-   학습 결과, 로그, 모델 파일 등은 `experiments/`, `wandb/`, `models/` 등에 저장됩니다.
+**필수 패키지 설치**
+```bash
+pip install -r requirements.txt
+```
+
+### 2. 데이터 준비
+`data/raw/` 폴더에 필요한 오디오 데이터(.wav 파일)와 메타데이터를 넣으세요.
+(데이터 파일은 직접 준비해야 하며, git에는 포함되지 않습니다.)
+
+### 3. 실험 실행
+
+**SSL(Self-Supervised Learning) 학습**
+```bash
+PYTHONPATH=. python scripts/train_ssl.py --exp exp001
+```
+
+**Fine-tuning 학습**
+```bash
+PYTHONPATH=. python scripts/train_finetune.py --exp exp001
+```
+
+**EDA(Exploratory Data Analysis) 실행**
+```bash
+PYTHONPATH=. python scripts/run_eda.py
+```
+
+### 4. 실험 설정 변경
+`scripts/experiments/` 폴더에서 실험 설정을 수정하거나 새로운 실험을 추가할 수 있습니다.
+- `exp001.py`: 기본 SSL + Fine-tuning 실험
+- `exp002.py`: 다양한 데이터 증강 실험
+
+### 5. 실험 결과 확인
+- **학습 로그**: `wandb/` 폴더 또는 W&B 웹 대시보드
+- **체크포인트**: `checkpoints/exp001/` 폴더
+- **EDA 결과**: `eda_results/` 폴더
 
 ---
 
