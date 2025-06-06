@@ -1,0 +1,17 @@
+{"time":"2025-06-05T14:34:43.7749407+09:00","level":"INFO","msg":"stream: starting","core version":"0.20.1","symlink path":"C:\\Users\\USER\\Desktop\\ADV\\wandb\\run-20250605_143443-i1b4y42l\\logs\\debug-core.log"}
+{"time":"2025-06-05T14:34:44.2328597+09:00","level":"INFO","msg":"stream: created new stream","id":"i1b4y42l"}
+{"time":"2025-06-05T14:34:44.2333848+09:00","level":"INFO","msg":"stream: started","id":"i1b4y42l"}
+{"time":"2025-06-05T14:34:44.2353889+09:00","level":"INFO","msg":"sender: started","stream_id":"i1b4y42l"}
+{"time":"2025-06-05T14:34:44.2353889+09:00","level":"INFO","msg":"handler: started","stream_id":"i1b4y42l"}
+{"time":"2025-06-05T14:34:44.2366794+09:00","level":"INFO","msg":"writer: Do: started","stream_id":"i1b4y42l"}
+{"time":"2025-06-05T14:34:44.4338883+09:00","level":"ERROR","msg":"HTTP error","status":403,"method":"POST","url":"https://api.wandb.ai/graphql"}
+{"time":"2025-06-05T14:34:44.4343991+09:00","level":"ERROR","msg":"runupserter: failed to init run","error":"returned error 403: {\"data\":{\"upsertBucket\":null},\"errors\":[{\"message\":\"permission denied\",\"path\":[\"upsertBucket\"],\"extensions\":{\"code\":\"PERMISSION_ERROR\"}}]}"}
+{"time":"2025-06-05T14:34:45.4399832+09:00","level":"INFO","msg":"stream: closing","id":"i1b4y42l"}
+{"time":"2025-06-05T14:34:45.441167+09:00","level":"ERROR","msg":"sender: uploadConfigFile: stream: no run"}
+{"time":"2025-06-05T14:34:45.7174141+09:00","level":"ERROR","msg":"HTTP error","status":404,"method":"POST","url":"https://api.wandb.ai/graphql"}
+{"time":"2025-06-05T14:34:45.7174141+09:00","level":"ERROR","msg":"runfiles: CreateRunFiles returned error: returned error 404: {\"data\":{\"createRunFiles\":null},\"errors\":[{\"message\":\"project /lung-sound-classification not found during createRunFiles\",\"path\":[\"createRunFiles\"]}]}"}
+{"time":"2025-06-05T14:34:45.7186823+09:00","level":"INFO","msg":"fileTransfer: Close: file transfer manager closed"}
+{"time":"2025-06-05T14:34:45.7186823+09:00","level":"INFO","msg":"handler: closed","stream_id":"i1b4y42l"}
+{"time":"2025-06-05T14:34:45.7186823+09:00","level":"INFO","msg":"writer: Close: closed","stream_id":"i1b4y42l"}
+{"time":"2025-06-05T14:34:45.7186823+09:00","level":"INFO","msg":"sender: closed","stream_id":"i1b4y42l"}
+{"time":"2025-06-05T14:34:45.7191992+09:00","level":"INFO","msg":"stream: closed","id":"i1b4y42l"}

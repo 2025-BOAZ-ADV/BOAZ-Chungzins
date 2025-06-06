@@ -1,0 +1,18 @@
+[INFO] Preprocessing cycles...
+100%|█████████████████████████████████████████████████████| 539/539 [00:08<00:00, 62.15it/s]
+[WARNING] Missing file: C:\Users\USER\Desktop\ADV\data\raw\226_1b1_Pl_sc_Meditron.txt or C:\Users\USER\Desktop\ADV\data\raw\226_1b1_Pl_sc_Meditron.wav
+[INFO] Total cycles collected: 4131
+Traceback (most recent call last):
+  File "C:\Users\USER\Desktop\ADV\scripts\train_ssl.py", line 109, in <module>
+    main()
+  File "C:\Users\USER\Desktop\ADV\scripts\train_ssl.py", line 78, in main
+    model = MoCo(
+  File "C:\Users\USER\Desktop\ADV\models\moco.py", line 20, in __init__
+    self.encoder_q = base_encoder()  # query encoder
+  File "C:\Users\USER\Desktop\ADV\models\backbone.py", line 38, in create_backbone
+    resnet.load_state_dict(state_dict, strict=False)
+  File "C:\Users\USER\Desktop\ADV\.venv\lib\site-packages\torch\nn\modules\module.py", line 2593, in load_state_dict
+    raise RuntimeError(
+RuntimeError: Error(s) in loading state_dict for ResNet:
+	size mismatch for fc.weight: copying a param with shape torch.Size([1000, 2048]) from checkpoint, the shape in current model is torch.Size([1, 2048]).
+	size mismatch for fc.bias: copying a param with shape torch.Size([1000]) from checkpoint, the shape in current model is torch.Size([1]).

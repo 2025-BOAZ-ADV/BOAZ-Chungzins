@@ -1,0 +1,60 @@
+[INFO] Preprocessing cycles...
+100%|█████████████████████████████████████████████████████| 539/539 [00:10<00:00, 53.38it/s]
+[WARNING] Missing file: C:\Users\USER\Desktop\ADV\data\raw\226_1b1_Pl_sc_Meditron.txt or C:\Users\USER\Desktop\ADV\data\raw\226_1b1_Pl_sc_Meditron.wav
+[INFO] Total cycles collected: 4131
+Epoch 0:  47%|███████████▎            | 15/32 [06:57<07:52, 27.81s/it, Loss=6.41, Acc=0.573]
+Error in sys.excepthook:
+Traceback (most recent call last):
+  File "C:\Users\USER\AppData\Local\Programs\Python\Python310\lib\linecache.py", line 46, in getlines
+    return updatecache(filename, module_globals)
+  File "C:\Users\USER\AppData\Local\Programs\Python\Python310\lib\linecache.py", line 136, in updatecache
+    with tokenize.open(fullname) as fp:
+  File "C:\Users\USER\AppData\Local\Programs\Python\Python310\lib\tokenize.py", line 394, in open
+    buffer = _builtin_open(filename, 'rb')
+KeyboardInterrupt
+
+Original exception was:
+Traceback (most recent call last):
+  File "C:\Users\USER\Desktop\ADV\scripts\train_ssl.py", line 109, in <module>
+    main()
+  File "C:\Users\USER\Desktop\ADV\scripts\train_ssl.py", line 100, in main
+    history = trainer.train(
+  File "C:\Users\USER\Desktop\ADV\trainers\pretext.py", line 97, in train
+    loss, acc = self.train_epoch(epoch)
+  File "C:\Users\USER\Desktop\ADV\trainers\pretext.py", line 59, in train_epoch
+    loss, logits, labels = self.model(aug1, aug2, epoch)
+  File "C:\Users\USER\Desktop\ADV\.venv\lib\site-packages\torch\nn\modules\module.py", line 1751, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+  File "C:\Users\USER\Desktop\ADV\.venv\lib\site-packages\torch\nn\modules\module.py", line 1762, in _call_impl
+    return forward_call(*args, **kwargs)
+  File "C:\Users\USER\Desktop\ADV\models\moco.py", line 80, in forward
+    g1 = F.normalize(self.encoder_q(im_q), dim=1)  # shape: [B, 2048]
+  File "C:\Users\USER\Desktop\ADV\.venv\lib\site-packages\torch\nn\modules\module.py", line 1751, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+  File "C:\Users\USER\Desktop\ADV\.venv\lib\site-packages\torch\nn\modules\module.py", line 1762, in _call_impl
+    return forward_call(*args, **kwargs)
+  File "C:\Users\USER\Desktop\ADV\.venv\lib\site-packages\torchvision\models\resnet.py", line 285, in forward
+    return self._forward_impl(x)
+  File "C:\Users\USER\Desktop\ADV\.venv\lib\site-packages\torchvision\models\resnet.py", line 275, in _forward_impl
+    x = self.layer3(x)
+  File "C:\Users\USER\Desktop\ADV\.venv\lib\site-packages\torch\nn\modules\module.py", line 1751, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+  File "C:\Users\USER\Desktop\ADV\.venv\lib\site-packages\torch\nn\modules\module.py", line 1762, in _call_impl
+    return forward_call(*args, **kwargs)
+  File "C:\Users\USER\Desktop\ADV\.venv\lib\site-packages\torch\nn\modules\container.py", line 240, in forward
+    input = module(input)
+  File "C:\Users\USER\Desktop\ADV\.venv\lib\site-packages\torch\nn\modules\module.py", line 1751, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+  File "C:\Users\USER\Desktop\ADV\.venv\lib\site-packages\torch\nn\modules\module.py", line 1762, in _call_impl
+    return forward_call(*args, **kwargs)
+  File "C:\Users\USER\Desktop\ADV\.venv\lib\site-packages\torchvision\models\resnet.py", line 150, in forward
+    out = self.conv2(out)
+  File "C:\Users\USER\Desktop\ADV\.venv\lib\site-packages\torch\nn\modules\module.py", line 1751, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+  File "C:\Users\USER\Desktop\ADV\.venv\lib\site-packages\torch\nn\modules\module.py", line 1762, in _call_impl
+    return forward_call(*args, **kwargs)
+  File "C:\Users\USER\Desktop\ADV\.venv\lib\site-packages\torch\nn\modules\conv.py", line 554, in forward
+    return self._conv_forward(input, self.weight, self.bias)
+  File "C:\Users\USER\Desktop\ADV\.venv\lib\site-packages\torch\nn\modules\conv.py", line 549, in _conv_forward
+    return F.conv2d(
+KeyboardInterrupt
