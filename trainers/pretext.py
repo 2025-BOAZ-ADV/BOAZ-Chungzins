@@ -9,6 +9,8 @@ from data.augmentation import apply_spec_augment
 from utils.logger import WandbLogger
 from config.config import Config
 
+# test for git push
+
 class PretextTrainer:
     def __init__(
         self,
