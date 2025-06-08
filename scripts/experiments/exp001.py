@@ -59,9 +59,10 @@ class ExperimentConfig:
     seed = 42
     # 데이터 분할 (pretrain - finetune)
     split_ratio = 0.8
-    # 데이터 분할
-    ssl_ratio = 1.0  # 다시 체크
-    val_ratio = 0.0  # 다시 체크
+    # 데이터 분할 (finetune 내에서 train - val)
+    allow_val = False     # 현재는 X
+    ssl_ratio = 0.7
+    val_ratio = 0.3
     # 설정
     ssl = SSLConfig
     finetune = FinetuneConfig

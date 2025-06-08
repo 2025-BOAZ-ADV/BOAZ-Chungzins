@@ -14,17 +14,17 @@ class FinetuneTrainer:
     def __init__(
         self,
         model: LungSoundClassifier,
-        train_loader: DataLoader,
-        val_loader: Optional[DataLoader],
         device: torch.device,
         config: Config,
+        train_loader: DataLoader,
+        val_loader: Optional[DataLoader] = None,
         logger: WandbLogger = None
     ):
         self.model = model
-        self.train_loader = train_loader
-        self.val_loader = val_loader
         self.device = device
         self.config = config
+        self.train_loader = train_loader
+        self.val_loader = val_loader
         self.logger = logger
         
         # Binary Cross Entropy for multi-label classification
@@ -89,8 +89,8 @@ class FinetuneTrainer:
         Returns:
             validation loss, f1 score
         """
-        # Validation Set이 없을 경우 아래처럼 작성하면 Validation을 건너뛰고 Train loss만 계산됨
-        if not self.val_loader:
+        # Validation Loader를 입력받지 않을 경우 Validation을 건너뛰고 Train loss만 계산됨
+        if not isinstance(self.val_loader, DataLoader):
             print("=========== No Validation Loader ===========")
             return 0.0, 0.0
             

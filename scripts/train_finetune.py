@@ -59,34 +59,58 @@ def main():
         use_cache=False,    # 추후 True로 바꾸기
     )
     
-    ###############################################33
-    # SSL/Finetune 분할
-    _, finetune_files = split_by_patient(
-        dataset.df,
-        test_size=(1 - config.ssl_ratio)
+    # train data의 일부를 가져와 파인튜닝용 데이터셋 구축
+    finetune_filename_list = get_shuffled_filenames(
+        metadata_path=str(metadata_path),
+        option="finetune",
+        split_ratio=config.split_ratio,
+        seed=config.seed
+    )
+    finetune_dataset = split_cycledataset(
+        train_dataset,
+        finetune_filename_list,
+        seed=config.seed
     )
     
-    # Train/Val 분할
-    train_files, val_files = train_test_split(
-        finetune_files,
-        test_size=config.val_ratio,
-        random_state=42
-    )
+    ##### 파인튜닝용 데이터셋 내에서 다시 train-validation split #####
+    ##### 현재는 하지 않습니다. 테스트도 아직 안 한 상태 (기본값=False) #####
+    if allow_val == True: 
+        # train-val filename split
+        train_file_list, val_file_list = train_test_split(
+            finetune_filename_list,
+            test_size=config.val_ratio,
+            random_state=42
+        )
     
-    # 데이터셋 분할
-    _, finetune_dataset = split_ssl_finetune(dataset, [], finetune_files)
-    train_indices = [i for i, (_, _, meta) in enumerate(finetune_dataset) 
-                    if meta[0] in train_files]
-    val_indices = [i for i, (_, _, meta) in enumerate(finetune_dataset) 
-                  if meta[0] in val_files]
-    
-    # 데이터로더 생성
-    dataloaders = create_dataloaders(
-        train_dataset=torch.utils.data.Subset(finetune_dataset, train_indices),
-        val_dataset=torch.utils.data.Subset(finetune_dataset, val_indices),
-        batch_size=config.finetune.batch_size,
-        num_workers=config.finetune.num_workers
-    )
+        # train-val idx split
+        train_indices = [i for i, (_, _, meta) in enumerate(train_dataset) 
+                        if meta[0] in train_file_list]
+        val_indices = [i for i, (_, _, meta) in enumerate(train_dataset) 
+                    if meta[0] in val_file_list]
+        
+        # DataLoader 생성
+        dataloaders = create_dataloaders(
+            train_dataset=torch.utils.data.Subset(train_dataset, train_indices),
+            val_dataset=torch.utils.data.Subset(train_dataset, val_indices),
+            batch_size=config.finetune.batch_size,
+            num_workers=config.finetune.num_workers
+        )
+
+        train_loader = dataloaders['train']
+        val_loader = dataloaders['val']
+
+    else:
+        train_loader = torch.utils.data.DataLoader(
+            finetune_dataset,
+            batch_size=config.finetune.batch_size,
+            shuffle=False,      # 추후 개선할 부분, 이미 dataset이 한번 셔플된 상태
+            num_workers=0 if device.type == 'cpu' else config.finetune.num_workers,
+            pin_memory=torch.cuda.is_available(),
+            drop_last=True      # 추후 개선할 부분
+        )
+
+        # Validation을 하지 않을 경우 val_loader는 None으로 지정
+        val_loader = None
     
     # 모델 생성
     model = create_classifier(
@@ -107,10 +131,10 @@ def main():
     # 트레이너 생성
     trainer = FinetuneTrainer(
         model=model,
-        train_loader=dataloaders['train'],
-        val_loader=dataloaders['val'],
         device=device,
         config=config.finetune,
+        train_loader=train_loader,
+        val_loader=val_loader,
         logger=logger
     )
     

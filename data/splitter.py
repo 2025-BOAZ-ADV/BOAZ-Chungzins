@@ -84,20 +84,20 @@ def create_dataloaders(pretext_dataset: Dataset,
         Dictionary containing DataLoaders
     """
     dataloaders = {
-        'pretext': DataLoader(
+        'train': DataLoader(
             pretext_dataset,
             batch_size=batch_size,
             num_workers=num_workers,
-            shuffle=True,
-            pin_memory=True,
+            shuffle=False,
+            pin_memory=torch.cuda.is_available(),
             drop_last=True
         ),
-        'finetune': DataLoader(
+        'val': DataLoader(
             finetune_dataset,
             batch_size=batch_size,
             num_workers=num_workers,
-            shuffle=True,
-            pin_memory=True,
+            shuffle=False,
+            pin_memory=torch.cuda.is_available(),
             drop_last=True
         )
     }
