@@ -168,7 +168,7 @@ class FinetuneTrainer:
                     'optimizer_state_dict': self.optimizer.state_dict(),
                     'scheduler_state_dict': self.scheduler.state_dict(),
                     'best_val_f1': best_val_f1,
-                }, f'{save_path}/best_model.pth')
+                }, f'{save_path}/best_finetuned_model.pth')
             
             print(f'Epoch {epoch}:')
             print(f'Train - Loss: {train_loss:.4f}, F1: {train_f1:.4f}')

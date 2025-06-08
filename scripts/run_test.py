@@ -18,8 +18,6 @@ def parse_args():
     parser = argparse.ArgumentParser(description='STEP 3. Test')
     parser.add_argument('--exp', type=str, required=True,
                         help='실험 설정 파일 (experiments 폴더 내 파일명)')
-    parser.add_argument('--data-dir', type=str, required=True,
-                        help='데이터 디렉토리 경로')
     parser.add_argument('--ssl-checkpoint', type=str, required=True,
                         help='SSL 모델 체크포인트 경로')
     return parser.parse_args()
@@ -44,6 +42,10 @@ def main():
     
     # 디바이스 설정
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+
+    # 데이터셋 경로 설정
+    data_path = project_root / 'data' / 'raw'
+    metadata_path = project_root / 'data' / 'metadata'
     
     # test data로 CycleDataset 생성
     test_dataset = CycleDataset(

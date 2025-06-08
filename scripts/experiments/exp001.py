@@ -17,8 +17,8 @@ class SSLConfig(BaseConfig):
         {
             'type': 'SpecAugment',
             'params': {
-                'time_mask_param': 0.8,
-                'freq_mask_param': 0.8
+                'time_mask_param': 0.3,
+                'freq_mask_param': 0.3
             }
         }
     ]
@@ -60,15 +60,15 @@ class ExperimentConfig:
     # 데이터 분할 (pretrain - finetune)
     split_ratio = 0.8
     # 데이터 분할 (finetune 내에서 train - val)
-    allow_val = False     # 현재는 X
+    allow_val = False     # 현재는 val X
     ssl_ratio = 0.7
     val_ratio = 0.3
     # 설정
     ssl = SSLConfig
     finetune = FinetuneConfig
     # Wandb 설정
-    wandb_project = "lung-sound-classification"
-    wandb_entity = "boaz_woony-boaz"     # 본인 wandb 계정명으로 변경
+    wandb_project = "ICBHI_MLS_MoCo"
+    wandb_entity = "boaz_woony-boaz"
     # 저장 경로
     checkpoint_dir = "checkpoints/exp001"
     log_dir = "logs/exp001"

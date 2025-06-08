@@ -123,6 +123,6 @@ class PretrainTrainer:
                     'optimizer_state_dict': self.optimizer.state_dict(),
                     'scheduler_state_dict': self.scheduler.state_dict(),
                     'loss': loss,
-                }, f'{save_path}/checkpoint_epoch_{epoch}.pth')
+                }, f'{save_path}/best_pretrained_model.pth')
         
         return history

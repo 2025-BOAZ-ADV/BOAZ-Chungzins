@@ -17,8 +17,6 @@ def parse_args():
     parser = argparse.ArgumentParser(description='STEP 2. Fine-tuning')
     parser.add_argument('--exp', type=str, required=True,
                         help='실험 설정 파일 (experiments 폴더 내 파일명)')
-    parser.add_argument('--data-dir', type=str, required=True,
-                        help='데이터 디렉토리 경로')
     parser.add_argument('--ssl-checkpoint', type=str, required=True,
                         help='SSL 모델 체크포인트 경로')
     parser.add_argument('--resume', type=str,
@@ -33,8 +31,8 @@ def main():
     config = exp_module.ExperimentConfig
     
     # 디렉토리 생성
-    out_dir = Path(config.checkpoint_dir)
-    out_dir.mkdir(parents=True, exist_ok=True)
+    checkpoints_dir = project_root / 'checkpoints' / args.exp
+    checkpoints_dir.mkdir(parents=True, exist_ok=True)
     
     # wandb 초기화
     logger = WandbLogger(
@@ -45,6 +43,10 @@ def main():
     
     # 디바이스 설정
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+
+    # 데이터셋 경로 설정
+    data_path = project_root / 'data' / 'raw'
+    metadata_path = project_root / 'data' / 'metadata'
     
     # train data로 CycleDataset 생성
     train_dataset = CycleDataset(
@@ -142,7 +144,7 @@ def main():
     # 학습 실행
     history = trainer.train(
         epochs=config.finetune.epochs - start_epoch,
-        save_path=str(out_dir)
+        save_path=str(checkpoints_dir)
     )
     
     # wandb 종료
