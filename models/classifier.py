@@ -55,9 +55,11 @@ def create_classifier(checkpoint_path=None, num_classes=2, freeze_backbone=True,
     """
     backbone = create_backbone()
     
-    if checkpoint_path:
-        checkpoint = torch.load(checkpoint_path)
-        # MoCo의 encoder_q에서 가중치 로드
-        backbone.load_state_dict(checkpoint['model_state_dict'], strict=False)
+    # MoCo의 encoder_q에서 가중치 로드
+    checkpoint = torch.load(checkpoint_path)
+    backbone.load_state_dict(checkpoint['model_state_dict'], strict=False)
+
+    # encoder_q의 가중치 동결
+    backbone = backbone.encoder_q.eval()
     
     return LungSoundClassifier(backbone, num_classes, freeze_backbone, dropout_rate)

@@ -14,7 +14,7 @@ from trainers.pretrain import PretrainTrainer
 from utils.logger import WandbLogger
 
 def parse_args():
-    parser = argparse.ArgumentParser(description='Self-supervised Learning Training')
+    parser = argparse.ArgumentParser(description='STEP 1. Pretraining')
     parser.add_argument('--exp', type=str, required=True,
                         help='실험 설정 파일 (experiments 폴더 내 파일명)')
     parser.add_argument('--resume', type=str,
@@ -41,7 +41,7 @@ def main():
     
     # wandb 초기화
     logger = WandbLogger(
-        project_name=config.wandb_project,
+        project_name=f"{config.wandb_project}-pretrain",
         config=vars(ssl_config),
         entity=config.wandb_entity
     )
@@ -64,7 +64,7 @@ def main():
         hop_length=ssl.config.hop_length,
         n_mels=ssl.config.n_mels,
         use_cache=False,    # 추후 True로 바꾸기
-        save_cache=False
+        save_cache=True
     )
 
     # train data의 일부를 가져와 사전훈련용 데이터셋 구축

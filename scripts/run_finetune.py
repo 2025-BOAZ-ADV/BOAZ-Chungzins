@@ -14,7 +14,7 @@ from trainers.finetune import FinetuneTrainer
 from utils.logger import WandbLogger
 
 def parse_args():
-    parser = argparse.ArgumentParser(description='Fine-tuning Training')
+    parser = argparse.ArgumentParser(description='STEP 2. Fine-tuning')
     parser.add_argument('--exp', type=str, required=True,
                         help='실험 설정 파일 (experiments 폴더 내 파일명)')
     parser.add_argument('--data-dir', type=str, required=True,
@@ -57,7 +57,7 @@ def main():
         hop_length=ssl.config.hop_length,
         n_mels=ssl.config.n_mels,
         use_cache=False,    # 추후 True로 바꾸기
-        save_cache=False
+        save_cache=True
     )
     
     # train data의 일부를 가져와 파인튜닝용 데이터셋 구축
@@ -129,7 +129,7 @@ def main():
         start_epoch = checkpoint['epoch'] + 1
         print(f"Resuming from epoch {start_epoch}")
     
-    # 트레이너 생성
+    # Trainer 생성
     trainer = FinetuneTrainer(
         model=model,
         device=device,

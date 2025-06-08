@@ -25,10 +25,12 @@ ADV/
 │   ├── run_eda.py         # EDA 실행 스크립트
 │   ├── run_finetune.py    # 파인튜닝 스크립트
 │   ├── run_pretrain.py    # 사전훈련 스크립트
+│   ├── run_test.py        # 테스트 스크립트
 │   └── experiments/       # 실험별 실행 스크립트
 ├── trainers/              # 학습 관련 코드
 │   ├── finetune.py        # 파인튜닝 트레이너
-│   └── pretext.py         # 프리텍스트 트레이너
+│   ├── pretrain.py        # 사전훈련 트레이너
+│   ├── test.py            # 테스트 모듈
 ├── utils/                 # 유틸리티 함수
 │   ├── eda.py             # EDA 관련 함수
 │   ├── logger.py          # 로깅 함수
@@ -46,9 +48,9 @@ ADV/
 - **config/** : 하이퍼파라미터, 경로 등 설정 파일
 - **data/** : 데이터 로딩, 전처리, 증강, 분할 등 데이터 관련 코드
 - **models/** : 모델 구조 정의 (백본, 분류기, MoCo 등)
-- **trainers/** : 학습, 검증, 테스트 관련 코드
+- **trainers/** : 사전훈련, 파인튜닝, 테스트 관련 코드
 - **utils/** : EDA, 로깅, 평가 지표 등 보조 함수
-- **scripts/** : EDA, 학습 등 실행 스크립트
+- **scripts/** : EDA, 사전훈련, 파인튜닝, 테스트 스크립트
 - **experiments/**, **eda_results/**, **wandb/**, **wandb_logs/** : 실험 결과 및 로그 (git에 업로드 X)
 - **Multi_label_Moco_0607.ipynb** : 원본 Jupyter 노트북
 

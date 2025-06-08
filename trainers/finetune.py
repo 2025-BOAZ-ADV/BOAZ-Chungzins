@@ -84,17 +84,18 @@ class FinetuneTrainer:
     
     @torch.no_grad()
     def validate(self) -> Tuple[float, float]:
-        """검증 수행
+        """fine-tuning 과정에서 validation 수행
         
         Returns:
             validation loss, f1 score
         """
+        self.model.eval()
+
         # Validation Loader를 입력받지 않을 경우 Validation을 건너뛰고 Train loss만 계산됨
         if not isinstance(self.val_loader, DataLoader):
             print("=========== No Validation Loader ===========")
             return 0.0, 0.0
-            
-        self.model.eval()
+
         total_loss = 0
         all_preds = []
         all_labels = []
