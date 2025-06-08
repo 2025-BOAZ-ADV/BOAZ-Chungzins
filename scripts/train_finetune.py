@@ -1,4 +1,4 @@
-"""Fine-tuning 학습 스크립트"""
+"""2. Fine-tuning 스크립트"""
 
 import os
 import argparse
@@ -8,7 +8,7 @@ from importlib import import_module
 from sklearn.model_selection import train_test_split
 
 from data.dataset import CycleDataset
-from data.splitter import split_by_patient, split_ssl_finetune, create_dataloaders
+from data.splitter import split_cycledataset, create_dataloaders
 from models.classifier import create_classifier
 from trainers.finetune import FinetuneTrainer
 from utils.logger import WandbLogger
@@ -46,15 +46,20 @@ def main():
     # 디바이스 설정
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     
-    # 데이터셋 로드
-    dataset = CycleDataset(
-        data_dir=args.data_dir,
-        sr=config.ssl.target_sr,
-        n_mels=config.ssl.n_mels,
-        frame_size=config.ssl.frame_size,
-        hop_length=config.ssl.hop_length
+    # train data로 CycleDataset 생성
+    train_dataset = CycleDataset(
+        data_path=str(data_path),
+        metadata_path=str(metadata_path),
+        option="train",
+        target_sr=ssl_config.target_sr,
+        target_sec=ssl_config.target_sec,
+        frame_size=ssl.config.frame_size,
+        hop_length=ssl.config.hop_length,
+        n_mels=ssl.config.n_mels,
+        use_cache=False,    # 추후 True로 바꾸기
     )
     
+    ###############################################33
     # SSL/Finetune 분할
     _, finetune_files = split_by_patient(
         dataset.df,

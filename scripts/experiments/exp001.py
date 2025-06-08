@@ -48,16 +48,20 @@ class FinetuneConfig:
     freeze_backbone = True
     dropout_rate = 0.5
     # Data augmentation
-    use_augmentation = True
+    use_augmentation = False
     time_mask_ratio = 0.4
     freq_mask_ratio = 0.4
 
 class ExperimentConfig:
     name = "exp001_basic_ssl_finetune"
     description = "기본 SSL + Fine-tuning 실험"
+    # 랜덤 시드
+    seed = 42
+    # 데이터 분할 (pretrain - finetune)
+    split_ratio = 0.8
     # 데이터 분할
-    ssl_ratio = 0.8  # SSL에 사용할 데이터 비율
-    val_ratio = 0.2  # Fine-tuning시 검증 데이터 비율
+    ssl_ratio = 1.0  # 다시 체크
+    val_ratio = 0.0  # 다시 체크
     # 설정
     ssl = SSLConfig
     finetune = FinetuneConfig

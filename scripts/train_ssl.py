@@ -1,4 +1,4 @@
-"""Self-supervised Learning 학습 스크립트"""
+"""1. Pretraining 스크립트"""
 
 import os
 import argparse
@@ -6,8 +6,9 @@ from pathlib import Path
 import torch
 from importlib import import_module
 
-from data.dataset import CycleDataset, MoCoCycleDataset
 from data.augmentation import create_augmenter
+from data.dataset import CycleDataset
+from data.splitter import get_shuffled_filenames, split_cycledataset
 from models.backbone import create_backbone
 from models.moco import MoCo
 from trainers.pretext import PretextTrainer
@@ -56,25 +57,43 @@ def main():
     # augmentation 설정
     augmenter = create_augmenter()
     
-    # 데이터셋 로드
-    dataset = MoCoCycleDataset(
+    # train data로 CycleDataset 생성
+    train_dataset = CycleDataset(
         data_path=str(data_path),
         metadata_path=str(metadata_path),
-        transform=augmenter,
+        option="train",
         target_sr=ssl_config.target_sr,
-        use_cache=True
+        target_sec=ssl_config.target_sec,
+        frame_size=ssl.config.frame_size,
+        hop_length=ssl.config.hop_length,
+        n_mels=ssl.config.n_mels,
+        use_cache=False,    # 추후 True로 바꾸기
     )
-      # 데이터로더 생성 (CPU/GPU 환경에 따라 자동 최적화)
-    train_loader = torch.utils.data.DataLoader(
-        dataset,
+
+    # train data의 일부를 가져와 사전훈련용 데이터셋 구축
+    pretrain_filename_list = get_shuffled_filenames(
+        metadata_path=str(metadata_path),
+        option="pretrain",
+        split_ratio=config.split_ratio,
+        seed=config.seed
+    )
+    pretrain_dataset = split_cycledataset(
+        train_dataset,
+        pretrain_filename_list,
+        seed=config.seed
+    )
+
+    # DataLoader 생성
+    pretrain_loader = torch.utils.data.DataLoader(
+        pretrain_dataset,
         batch_size=ssl_config.batch_size,
-        shuffle=True,
+        shuffle=False,      # 추후 개선할 부분, 이미 dataset이 한번 셔플된 상태
         num_workers=0 if device.type == 'cpu' else ssl_config.num_workers,
         pin_memory=torch.cuda.is_available(),
-        drop_last=True
+        drop_last=True      # 추후 개선할 부분
     )
     
-    # 모델 생성
+    # Multi-label MoCo 모델 생성
     model = MoCo(
         base_encoder=create_backbone
     ).to(device)
@@ -87,10 +106,10 @@ def main():
         start_epoch = checkpoint['epoch'] + 1
         print(f"Resuming from epoch {start_epoch}")
     
-    # 트레이너 생성
+    # Trainer 생성
     trainer = PretextTrainer(
         model=model,
-        train_loader=train_loader,
+        train_loader=pretrain_loader,
         device=device,
         config=ssl_config,
         logger=logger

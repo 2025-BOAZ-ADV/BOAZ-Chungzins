@@ -1,6 +1,6 @@
 import os
 from pathlib import Path
-from typing import Dict, List, Optional, Tuple, Union, Any
+from typing import Dict, List, Optional, Tuple, Union, Literal, Any
 
 import numpy as np
 import pandas as pd
@@ -27,36 +27,37 @@ class CycleDataset(Dataset):
         self,
         data_path: Union[str, Path],
         metadata_path: Optional[Union[str, Path]] = None,
+        option: Literal["train", "test"],
         target_sr: int = 4000,
-        use_cache: bool = True,
         target_sec: int = 8,
         frame_size: int = 1024,
         hop_length: int = 512,
-        n_mels: int = 128
+        n_mels: int = 128,
+        use_cache: bool = True
     ) -> None:
         self.data_path = Path(data_path)
+        self.option = str(option)
         self.target_sr = target_sr
         self.target_sec = target_sec
         self.frame_size = frame_size
         self.hop_length = hop_length
         self.n_mels = n_mels
-        self.cycle_list: List[Tuple[torch.Tensor, Dict]] = []
+        
         cache_dir = Path("data/processed")
         self.cache = DataCache(str(cache_dir)) if use_cache else None
         
-        # 모든 wav 파일 리스트 가져오기
-        self.file_list = [f.stem for f in self.data_path.glob("*.wav")]
-        
-        # train/test split이 있다면 로드
-        if metadata_path:
-            metadata_path = Path(metadata_path)
-            split_df = pd.read_csv(
-                metadata_path / "train_test_split.txt",
-                sep='\t',
-                header=None,
-                names=['filename', 'split']
-            )
-            self.file_list = split_df[split_df['split'] == 'train']['filename'].tolist()
+        # train/test set 중 하나에서 모든 wav 파일명 가져오기
+        metadata_path = Path(metadata_path)
+        split_df = pd.read_csv(
+            metadata_path / "train_test_split.txt",
+            sep='\t',
+            header=None,
+            names=['filename', 'set']
+        )
+        self.file_list = split_df[split_df['set'] == self.option]['filename'].tolist()
+
+        # 호흡 사이클 리스트 생성
+        self.cycle_list = []
 
         print("[INFO] Preprocessing cycles...")
         for filename in tqdm(self.file_list):
