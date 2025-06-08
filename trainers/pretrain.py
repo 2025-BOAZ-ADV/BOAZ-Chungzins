@@ -5,18 +5,18 @@ from tqdm import tqdm
 from typing import Dict, Tuple
 
 from models.moco import MoCo
-from data.augmentation import apply_spec_augment
+from data.augmentation import create_augmenter, apply_spec_augment
 from utils.logger import WandbLogger
 from config.config import Config
 
-class PretextTrainer:
+class PretrainTrainer:
     def __init__(
         self,
         model: MoCo,
         train_loader: DataLoader,
         device: torch.device,
         config: Config,
-        logger: WandbLogger = None
+        logger: WandbLogger = None,
     ):
         self.model = model
         self.train_loader = train_loader
@@ -50,11 +50,14 @@ class PretextTrainer:
         total_loss = 0
         correct = 0
         total = 0
-        
+
         progress_bar = tqdm(self.train_loader, desc=f'Epoch {epoch}')
         for batch_idx, (mel, _, _) in enumerate(progress_bar):
+            # Augmentation 생성 인스턴스 정의
+            augmenter = create_augmenter(self.config, self.augmentations)
+
             # 두 개의 augmentation 적용
-            aug1, aug2 = apply_spec_augment(mel)
+            aug1, aug2 = augmenter.generate_views(mel)[0], augmenter.generate_views(mel)[1]
             aug1, aug2 = aug1.to(self.device), aug2.to(self.device)
             
             # forward pass

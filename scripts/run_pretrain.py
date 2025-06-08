@@ -6,12 +6,11 @@ from pathlib import Path
 import torch
 from importlib import import_module
 
-from data.augmentation import create_augmenter
 from data.dataset import CycleDataset
 from data.splitter import get_shuffled_filenames, split_cycledataset
 from models.backbone import create_backbone
 from models.moco import MoCo
-from trainers.pretext import PretextTrainer
+from trainers.pretrain import PretrainTrainer
 from utils.logger import WandbLogger
 
 def parse_args():
@@ -53,9 +52,6 @@ def main():
     # 데이터셋 경로 설정
     data_path = project_root / 'data' / 'raw'
     metadata_path = project_root / 'data' / 'metadata'
-    
-    # augmentation 설정
-    augmenter = create_augmenter()
     
     # train data로 CycleDataset 생성
     train_dataset = CycleDataset(
@@ -108,7 +104,7 @@ def main():
         print(f"Resuming from epoch {start_epoch}")
     
     # Trainer 생성
-    trainer = PretextTrainer(
+    trainer = PretrainTrainer(
         model=model,
         train_loader=pretrain_loader,
         device=device,
