@@ -10,8 +10,7 @@ from torch.utils.data import Dataset
 from tqdm import tqdm
 
 from data.cache import DataCache
-from data.preprocessor import get_class, generate_mel_spectrogram, resample_waveform
-from data.augmentation import repeat_or_truncate_segment
+from data.preprocessor import resample_waveform, generate_mel_spectrogram, preprocess_waveform_segment, get_class
 from config.config import Config
 
 
@@ -33,7 +32,8 @@ class CycleDataset(Dataset):
         frame_size: int = 1024,
         hop_length: int = 512,
         n_mels: int = 128,
-        use_cache: bool = True
+        use_cache: bool = True,
+        save_cache: bool = False
     ) -> None:
         self.data_path = Path(data_path)
         self.option = str(option)
@@ -42,9 +42,12 @@ class CycleDataset(Dataset):
         self.frame_size = frame_size
         self.hop_length = hop_length
         self.n_mels = n_mels
+        self.use_cache = use_cache
+        self.save_cache = save_cache
         
         cache_dir = Path("data/processed")
-        self.cache = DataCache(str(cache_dir)) if use_cache else None
+        cache_dir.mkdir(parents=True, exist_ok=True)
+        self.cache = DataCache(str(cache_dir))
         
         # train/test set 중 하나에서 모든 wav 파일명 가져오기
         metadata_path = Path(metadata_path)
@@ -93,22 +96,25 @@ class CycleDataset(Dataset):
                 cache_key = f"{filename}_{idx}"
                 
                 # 캐시된 mel spectrogram이 있으면 로드
-                if self.cache and self.cache.exists(cache_key):
+                if self.use_cache and self.cache.exists(cache_key):
                     mel = self.cache.load(cache_key)
+
                 else:
                     # 호흡 사이클 분할
                     cycle_wave = waveform[:, start_sample:end_sample]
 
+                    # 호흡 사이클 길이 고정
+                    normed_wave = preprocess_waveform_segment(cycle_wave, unit_length=int(self.target_sec * self.target_sr))
+
                     # Mel Spectrogram으로 변환
-                    mel = generate_mel_spectrogram(cycle_wave, self.target_sr, frame_size=self.frame_size, hop_length=self.hop_length)
+                    mel = generate_mel_spectrogram(normed_wave, sample_rate, frame_size=self.frame_size, hop_length=self.hop_length, n_mels=self.n_mels)
                     
-                    # 프레임 수 계산 및 조정
+                    # 프레임 수 계산 및 비교
                     target_frames = int(self.target_sec * self.target_sr / self.hop_length)
-                    mel = repeat_or_truncate_segment(mel, target_frames)
                     assert mel.shape[-1] == target_frames, f"mel shape mismatch: {mel.shape} vs {target_frames}"
                     
                     # 캐시에 저장
-                    if self.cache:
+                    if self.save_cache:
                         self.cache.save(cache_key, mel)
 
                 # 라벨 생성

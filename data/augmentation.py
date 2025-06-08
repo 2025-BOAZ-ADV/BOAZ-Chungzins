@@ -62,15 +62,31 @@ class PitchShift(AugmentationBase):
             mel = torch.cat([mel[:, -shift:, :], mel[:, :-shift, :]], dim=1)
         return mel
 
-def repeat_or_truncate_segment(mel_segment: torch.Tensor, target_frames: int) -> torch.Tensor:
-    """Mel spectrogram 세그먼트를 target_frames에 맞게 조정"""
-    current_frames = mel_segment.shape[-1]
-    if current_frames >= target_frames:
-        return mel_segment[:, :, :target_frames]
-    else:
-        repeat_ratio = math.ceil(target_frames / current_frames)
-        mel_segment = mel_segment.repeat(1, 1, repeat_ratio)
-        return mel_segment[:, :, :target_frames]
+class TimeStretch(AugmentationBase):
+    """시간 축 스트레칭"""
+    def __init__(self, min_rate: float = 0.8, max_rate: float = 1.2):
+        self.min_rate = min_rate
+        self.max_rate = max_rate
+        
+    def __call__(self, mel: torch.Tensor) -> torch.Tensor:
+        rate = random.uniform(self.min_rate, self.max_rate)
+        if rate == 1.0:
+            return mel
+            
+        # 시간 축 크기 조정
+        orig_size = mel.shape[-1]
+        target_size = int(orig_size * rate)
+        mel_stretched = torch.nn.functional.interpolate(
+            mel, size=(mel.shape[1], target_size),
+            mode='bilinear', align_corners=False
+        )
+        
+        # 원래 길이로 자르거나 패딩
+        if target_size > orig_size:
+            return mel_stretched[:, :, :orig_size]
+        else:
+            padding = orig_size - target_size
+            return torch.nn.functional.pad(mel_stretched, (0, padding))
 
 class AugmentationComposer:
     """여러 증강 기법을 조합"""
@@ -120,32 +136,6 @@ class AugmentationComposer:
             List[torch.Tensor]: 증강된 views 리스트
         """
         return [self.__call__(mel) for _ in range(num_views)]
-
-class TimeStretch(AugmentationBase):
-    """시간 축 스트레칭"""
-    def __init__(self, min_rate: float = 0.8, max_rate: float = 1.2):
-        self.min_rate = min_rate
-        self.max_rate = max_rate
-        
-    def __call__(self, mel: torch.Tensor) -> torch.Tensor:
-        rate = random.uniform(self.min_rate, self.max_rate)
-        if rate == 1.0:
-            return mel
-            
-        # 시간 축 크기 조정
-        orig_size = mel.shape[-1]
-        target_size = int(orig_size * rate)
-        mel_stretched = torch.nn.functional.interpolate(
-            mel, size=(mel.shape[1], target_size),
-            mode='bilinear', align_corners=False
-        )
-        
-        # 원래 길이로 자르거나 패딩
-        if target_size > orig_size:
-            return mel_stretched[:, :, :orig_size]
-        else:
-            padding = orig_size - target_size
-            return torch.nn.functional.pad(mel_stretched, (0, padding))
 
 def create_augmenter(config: Config, augmentations: [List[Dict[str, Any]]]) -> AugmentationComposer:
     """증강기 생성
@@ -208,3 +198,15 @@ def apply_spec_augment(mel_segment: torch.Tensor):
     aug2 = freq_masking(time_masking(mel_segment.clone()))
 
     return aug1, aug2
+
+
+### 사용하지 않는 함수
+def repeat_or_truncate_segment(mel_segment: torch.Tensor, target_frames: int) -> torch.Tensor:
+    """Mel spectrogram 세그먼트를 target_frames에 맞게 조정"""
+    current_frames = mel_segment.shape[-1]
+    if current_frames >= target_frames:
+        return mel_segment[:, :, :target_frames]
+    else:
+        repeat_ratio = math.ceil(target_frames / current_frames)
+        mel_segment = mel_segment.repeat(1, 1, repeat_ratio)
+        return mel_segment[:, :, :target_frames]

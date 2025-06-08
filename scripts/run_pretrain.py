@@ -68,6 +68,7 @@ def main():
         hop_length=ssl.config.hop_length,
         n_mels=ssl.config.n_mels,
         use_cache=False,    # 추후 True로 바꾸기
+        save_cache=False
     )
 
     # train data의 일부를 가져와 사전훈련용 데이터셋 구축

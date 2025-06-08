@@ -8,7 +8,7 @@ from importlib import import_module
 from sklearn.model_selection import train_test_split
 
 from data.dataset import CycleDataset
-from data.splitter import split_cycledataset, create_dataloaders
+from data.splitter import get_shuffled_filenames, split_cycledataset, create_dataloaders
 from models.classifier import create_classifier
 from trainers.finetune import FinetuneTrainer
 from utils.logger import WandbLogger
@@ -57,6 +57,7 @@ def main():
         hop_length=ssl.config.hop_length,
         n_mels=ssl.config.n_mels,
         use_cache=False,    # 추후 True로 바꾸기
+        save_cache=False
     )
     
     # train data의 일부를 가져와 파인튜닝용 데이터셋 구축

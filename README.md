@@ -23,8 +23,8 @@ ADV/
 │   └── moco.py            # MoCo 관련 모델
 ├── scripts/               # 실행 스크립트
 │   ├── run_eda.py         # EDA 실행 스크립트
-│   ├── train_finetune.py  # 파인튜닝 학습 스크립트
-│   ├── train_ssl.py       # SSL 학습 스크립트
+│   ├── run_finetune.py    # 파인튜닝 스크립트
+│   ├── run_pretrain.py    # 사전훈련 스크립트
 │   └── experiments/       # 실험별 실행 스크립트
 ├── trainers/              # 학습 관련 코드
 │   ├── finetune.py        # 파인튜닝 트레이너
@@ -35,7 +35,7 @@ ADV/
 │   └── metrics.py         # 평가 지표 함수
 ├── wandb/                 # W&B 로그 (git에 업로드 X)
 ├── wandb_logs/            # W&B 추가 로그 (git에 업로드 X)
-├── 현석_New_Moco_0530 (1).ipynb # 실험용 노트북
+├── Multi_label_Moco_0607.ipynb # 원본 Jupyter 노트북
 ├── requirements.txt       # 패키지 목록
 ├── .env                   # 패키지 및 환경설정 파일
 ├── .gitignore             # git 제외 파일 목록
@@ -50,7 +50,7 @@ ADV/
 - **utils/** : EDA, 로깅, 평가 지표 등 보조 함수
 - **scripts/** : EDA, 학습 등 실행 스크립트
 - **experiments/**, **eda_results/**, **wandb/**, **wandb_logs/** : 실험 결과 및 로그 (git에 업로드 X)
-- **현석_New_Moco_0530 (1).ipynb** : 실험용 Jupyter 노트북
+- **Multi_label_Moco_0607.ipynb** : 원본 Jupyter 노트북
 
 ## 실행 방법
 
