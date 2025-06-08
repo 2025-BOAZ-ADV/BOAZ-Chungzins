@@ -147,17 +147,22 @@ class TimeStretch(AugmentationBase):
             padding = orig_size - target_size
             return torch.nn.functional.pad(mel_stretched, (0, padding))
 
-def create_augmenter(config: Optional[List[Dict[str, Any]]] = None) -> AugmentationComposer:
+def create_augmenter(config: Config, augmentations: [List[Dict[str, Any]]]) -> AugmentationComposer:
     """증강기 생성
     
     Args:
-        config: 증강 설정 (없으면 기본값 사용)
+        config: 실험 설정
+        augmentations: 증강 설정 리스트, dictionary로 구성된 리스트 (없으면 기본값 사용)
+        예시: [
+                {'type': 'SpecAugment', 'params': {'time_mask_param': 0.8}},
+                {'type': 'RandomCrop', 'params': {'crop_size': 128}}
+            ]
         
     Returns:
         AugmentationComposer 인스턴스
     """
-    if config is None:
-        config = [
+    if augmentations is None:
+        augmentations = [
             {
                 'type': 'SpecAugment',
                 'params': {
@@ -168,7 +173,7 @@ def create_augmenter(config: Optional[List[Dict[str, Any]]] = None) -> Augmentat
             {
                 'type': 'RandomCrop',
                 'params': {
-                    'crop_size': int(Config.target_sr * Config.target_sec)
+                    'crop_size': int(config.target_sr * config.target_sec)
                 }
             },
             {
@@ -186,7 +191,7 @@ def create_augmenter(config: Optional[List[Dict[str, Any]]] = None) -> Augmentat
             }
         ]
     
-    return AugmentationComposer(config)
+    return AugmentationComposer(augmentations)
 
 def apply_spec_augment(mel_segment: torch.Tensor):
     """
@@ -199,8 +204,7 @@ def apply_spec_augment(mel_segment: torch.Tensor):
     time_masking = T.TimeMasking(time_mask_param=int(M * 0.8))
     freq_masking = T.FrequencyMasking(freq_mask_param=int(F * 0.8))
 
-    aug1 = freq_masking(mel_segment.clone())
-    aug2 = time_masking(mel_segment.clone())
-    aug3 = freq_masking(time_masking(mel_segment.clone()))
+    aug1 = freq_masking(time_masking(mel_segment.clone()))
+    aug2 = freq_masking(time_masking(mel_segment.clone()))
 
-    return aug1, aug2, aug3
+    return aug1, aug2

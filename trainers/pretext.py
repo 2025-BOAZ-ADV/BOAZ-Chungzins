@@ -9,8 +9,6 @@ from data.augmentation import apply_spec_augment
 from utils.logger import WandbLogger
 from config.config import Config
 
-# test for git push
-
 class PretextTrainer:
     def __init__(
         self,
@@ -26,12 +24,14 @@ class PretextTrainer:
         self.config = config
         self.logger = logger
         
+        # Optimizer
         self.optimizer = optim.AdamW(
             self.model.parameters(),
             lr=config.learning_rate,
             weight_decay=config.weight_decay
         )
         
+        # Learning Rate Scheduler
         self.scheduler = optim.lr_scheduler.CosineAnnealingLR(
             self.optimizer,
             T_max=config.epochs
@@ -54,7 +54,7 @@ class PretextTrainer:
         progress_bar = tqdm(self.train_loader, desc=f'Epoch {epoch}')
         for batch_idx, (mel, _, _) in enumerate(progress_bar):
             # 두 개의 augmentation 적용
-            aug1, aug2, _ = apply_spec_augment(mel)
+            aug1, aug2 = apply_spec_augment(mel)
             aug1, aug2 = aug1.to(self.device), aug2.to(self.device)
             
             # forward pass

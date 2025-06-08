@@ -6,7 +6,7 @@ from pathlib import Path
 import torch
 from importlib import import_module
 
-from data.dataset import MoCoCycleDataset
+from data.dataset import CycleDataset, MoCoCycleDataset
 from data.augmentation import create_augmenter
 from models.backbone import create_backbone
 from models.moco import MoCo

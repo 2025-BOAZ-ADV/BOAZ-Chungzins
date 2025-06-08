@@ -31,7 +31,7 @@ class SSLConfig(BaseConfig):
     lambda_bce = 0.5
     # Training parameters
     batch_size = 128
-    num_workers = 12
+    num_workers = 2
     epochs = 300
     learning_rate = 0.03
     weight_decay = 0.01
@@ -39,11 +39,11 @@ class SSLConfig(BaseConfig):
 
 class FinetuneConfig:
     # Training parameters
-    batch_size = 32
-    num_workers = 4
+    batch_size = 128
+    num_workers = 2
     epochs = 100
-    learning_rate = 0.001
-    weight_decay = 0.0001
+    learning_rate = 0.03
+    weight_decay = 0.01
     # Model parameters
     freeze_backbone = True
     dropout_rate = 0.5

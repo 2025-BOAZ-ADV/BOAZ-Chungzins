@@ -28,6 +28,7 @@ class FinetuneTrainer:
         self.logger = logger
         
         # Binary Cross Entropy for multi-label classification
+        # --------------- 나중에 Focal Loss로 수정할 수 있음 ---------------
         self.criterion = nn.BCEWithLogitsLoss()
         
         # Optimizer
@@ -37,13 +38,10 @@ class FinetuneTrainer:
             weight_decay=config.finetune_weight_decay
         )
         
-        # Scheduler
-        self.scheduler = optim.lr_scheduler.ReduceLROnPlateau(
+        # Learning Rate Scheduler
+        self.scheduler = optim.lr_scheduler.CosineAnnealingLR(
             self.optimizer,
-            mode='min',
-            factor=0.5,
-            patience=5,
-            verbose=True
+            T_max=config.epochs
         )
 
     def train_epoch(self) -> Tuple[float, float]:
@@ -58,12 +56,12 @@ class FinetuneTrainer:
         all_labels = []
         
         progress_bar = tqdm(self.train_loader)
-        for mel, labels, _ in progress_bar:
-            mel, labels = mel.to(self.device), labels.to(self.device)
+        for mel, multi_label, _ in progress_bar:
+            mel, multi_label = mel.to(self.device), multi_label.to(self.device)
             
             # forward pass
             outputs = self.model(mel)
-            loss = self.criterion(outputs, labels)
+            loss = self.criterion(outputs, multi_label)
             
             # backward pass
             self.optimizer.zero_grad()
@@ -74,7 +72,7 @@ class FinetuneTrainer:
             total_loss += loss.item()
             preds = (torch.sigmoid(outputs) > 0.5).float()
             all_preds.extend(preds.cpu().numpy())
-            all_labels.extend(labels.cpu().numpy())
+            all_labels.extend(multi_label.cpu().numpy())
             
             # progress bar 업데이트
             progress_bar.set_postfix({'Loss': loss.item()})
@@ -91,7 +89,9 @@ class FinetuneTrainer:
         Returns:
             validation loss, f1 score
         """
+        # Validation Set이 없을 경우 아래처럼 작성하면 Validation을 건너뛰고 Train loss만 계산됨
         if not self.val_loader:
+            print("=========== No Validation Loader ===========")
             return 0.0, 0.0
             
         self.model.eval()
@@ -99,16 +99,16 @@ class FinetuneTrainer:
         all_preds = []
         all_labels = []
         
-        for mel, labels, _ in self.val_loader:
-            mel, labels = mel.to(self.device), labels.to(self.device)
+        for mel, multi_label, _ in self.val_loader:
+            mel, multi_label = mel.to(self.device), multi_label.to(self.device)
             
             outputs = self.model(mel)
-            loss = self.criterion(outputs, labels)
+            loss = self.criterion(outputs, multi_label)
             
             total_loss += loss.item()
             preds = (torch.sigmoid(outputs) > 0.5).float()
             all_preds.extend(preds.cpu().numpy())
-            all_labels.extend(labels.cpu().numpy())
+            all_labels.extend(multi_label.cpu().numpy())
         
         val_loss = total_loss / len(self.val_loader)
         val_f1 = f1_score(all_labels, all_preds, average='macro')
@@ -145,8 +145,7 @@ class FinetuneTrainer:
             history['val_f1'].append(val_f1)
             
             # scheduler step
-            if self.val_loader:
-                self.scheduler.step(val_loss)
+            self.scheduler.step()
             
             # logging
             if self.logger:
