@@ -54,9 +54,9 @@ def main():
         option="test",
         target_sr=ssl_config.target_sr,
         target_sec=ssl_config.target_sec,
-        frame_size=ssl.config.frame_size,
-        hop_length=ssl.config.hop_length,
-        n_mels=ssl.config.n_mels,
+        frame_size=ssl_config.frame_size,
+        hop_length=ssl_config.hop_length,
+        n_mels=ssl_config.n_mels,
         use_cache=False,    # 추후 True로 바꾸기
         save_cache=True
     )

@@ -76,26 +76,26 @@ pip install -r requirements.txt
 ```
 
 ### 2. 데이터 준비
-`data/raw/` 폴더에 필요한 오디오 데이터(.wav 파일)와 메타데이터를 넣으세요.
-(현재 폴더에 .wav 파일들이 모두 업로드되어 있습니다)
+`data/raw/` 폴더에 필요한 오디오 데이터(.wav 파일)와 메타데이터를 넣으세요.  
+(현재 폴더에는 .wav 파일들이 모두 업로드되어 있습니다)
 
-### 3. 실험 실행
-아래는 예시 구문입니다. bash에 입력하여 각 단계별로 학습/평가를 수행합니다.
+### 3. 실험 실행  
+아래는 예시 구문입니다. bash에 입력하여 각 단계별로 학습/평가를 수행합니다.  
 
-**STEP 1. Pretraining**
-필수 인자: `--exp`: 실험 세팅값
+**STEP 1. Pretraining**  
+필수 인자: `--exp`: 실험 세팅값  
 ```bash
 PYTHONPATH=. python scripts/run_pretrain.py --exp exp001
 ```
 
-**STEP 2. Fine-tuning**
-필수 인자: `--exp`: 실험 세팅값, `--ssl-checkpoint`: 사전훈련 인코더 가중치 경로
+**STEP 2. Fine-tuning**  
+필수 인자: `--exp`: 실험 세팅값, `--ssl-checkpoint`: 사전훈련 인코더 가중치 경로  
 ```bash
 PYTHONPATH=. python scripts/run_finetune.py --exp exp001 --ssl-checkpoint /checkpoints/exp001/best_pretrained_model.pth
 ```
 
-**STEP 3. Test**
-필수 인자: `--exp`: 실험 세팅값, `--ssl-checkpoint`: 사전훈련 인코더+분류기 가중치 경로
+**STEP 3. Test**  
+필수 인자: `--exp`: 실험 세팅값, `--ssl-checkpoint`: 사전훈련 인코더+분류기 가중치 경로  
 ```bash
 PYTHONPATH=. python scripts/run_test.py --exp exp001 --ssl-checkpoint /checkpoints/exp001/best_finetuned_model.pth
 ```
