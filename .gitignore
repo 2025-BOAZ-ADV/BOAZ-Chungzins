@@ -1,1 +1,4 @@
 *.wav
+__pycache__/
+*.pyc
+wandb/
