@@ -63,7 +63,7 @@ def main():
         frame_size=ssl_config.frame_size,
         hop_length=ssl_config.hop_length,
         n_mels=ssl_config.n_mels,
-        use_cache=False,    # 추후 True로 바꾸기
+        use_cache=False,    
         save_cache=True
     )
 
@@ -106,6 +106,7 @@ def main():
     # Trainer 생성
     trainer = PretrainTrainer(
         model=model,
+        augmentations=ssl_config.augmentations,
         train_loader=pretrain_loader,
         device=device,
         config=ssl_config,

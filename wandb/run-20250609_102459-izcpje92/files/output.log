@@ -1,0 +1,14 @@
+[INFO] Preprocessing cycles...
+100%|███████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 539/539 [00:14<00:00, 36.87it/s]
+[WARNING] Missing file: /home/HyeonSeok/BOAZ/BOAZ-Chungzins/data/raw/226_1b1_Pl_sc_Meditron.txt or /home/HyeonSeok/BOAZ/BOAZ-Chungzins/data/raw/226_1b1_Pl_sc_Meditron.wav
+[INFO] Total cycles collected: 4131
+Traceback (most recent call last):
+  File "/home/HyeonSeok/BOAZ/BOAZ-Chungzins/scripts/run_pretrain.py", line 125, in <module>
+    main()
+  File "/home/HyeonSeok/BOAZ/BOAZ-Chungzins/scripts/run_pretrain.py", line 77, in main
+    pretrain_dataset = split_cycledataset(
+                       ^^^^^^^^^^^^^^^^^^^
+  File "/home/HyeonSeok/BOAZ/BOAZ-Chungzins/data/splitter.py", line 68, in split_cycledataset
+    filename = dataset[i][2][0]
+               ~~~~~~~~~~~~~^^^
+KeyError: 0

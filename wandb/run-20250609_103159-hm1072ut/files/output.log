@@ -1,0 +1,72 @@
+[INFO] Preprocessing cycles...
+100%|███████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 539/539 [00:06<00:00, 77.57it/s]
+[WARNING] Missing file: /home/HyeonSeok/BOAZ/BOAZ-Chungzins/data/raw/226_1b1_Pl_sc_Meditron.txt or /home/HyeonSeok/BOAZ/BOAZ-Chungzins/data/raw/226_1b1_Pl_sc_Meditron.wav
+[INFO] Total cycles collected: 4131
+Epoch 0: 100%|██████████████████████████████████████████████████████████████████████████████████████████████████| 32/32 [01:51<00:00,  3.49s/it, Loss=5.99, Acc=0.684]
+Epoch 1: 100%|███████████████████████████████████████████████████████████████████████████████████████████████████| 32/32 [01:49<00:00,  3.43s/it, Loss=5.36, Acc=1.68]
+Epoch 2: 100%|███████████████████████████████████████████████████████████████████████████████████████████████████| 32/32 [01:50<00:00,  3.45s/it, Loss=4.89, Acc=2.69]
+Epoch 3:  44%|███████████████████████████████████████████▎                                                       | 14/32 [00:49<01:03,  3.51s/it, Loss=4.67, Acc=4.41]
+Traceback (most recent call last):
+  File "/home/HyeonSeok/BOAZ/BOAZ-Chungzins/scripts/run_pretrain.py", line 126, in <module>
+    main()
+  File "/home/HyeonSeok/BOAZ/BOAZ-Chungzins/scripts/run_pretrain.py", line 117, in main
+    history = trainer.train(
+              ^^^^^^^^^^^^^^
+  File "/home/HyeonSeok/BOAZ/BOAZ-Chungzins/trainers/pretrain.py", line 104, in train
+    loss, acc = self.train_epoch(epoch)
+                ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/HyeonSeok/BOAZ/BOAZ-Chungzins/trainers/pretrain.py", line 66, in train_epoch
+    loss, logits, labels = self.model(aug1, aug2, epoch)
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/HyeonSeok/BOAZ/venv/lib/python3.11/site-packages/torch/nn/modules/module.py", line 1751, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/HyeonSeok/BOAZ/venv/lib/python3.11/site-packages/torch/nn/modules/module.py", line 1762, in _call_impl
+    return forward_call(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/HyeonSeok/BOAZ/BOAZ-Chungzins/models/moco.py", line 80, in forward
+    g1 = F.normalize(self.encoder_q(im_q), dim=1)  # shape: [B, 2048]
+                     ^^^^^^^^^^^^^^^^^^^^
+  File "/home/HyeonSeok/BOAZ/venv/lib/python3.11/site-packages/torch/nn/modules/module.py", line 1751, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/HyeonSeok/BOAZ/venv/lib/python3.11/site-packages/torch/nn/modules/module.py", line 1762, in _call_impl
+    return forward_call(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/HyeonSeok/BOAZ/venv/lib/python3.11/site-packages/torchvision/models/resnet.py", line 285, in forward
+    return self._forward_impl(x)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/home/HyeonSeok/BOAZ/venv/lib/python3.11/site-packages/torchvision/models/resnet.py", line 274, in _forward_impl
+    x = self.layer2(x)
+        ^^^^^^^^^^^^^^
+  File "/home/HyeonSeok/BOAZ/venv/lib/python3.11/site-packages/torch/nn/modules/module.py", line 1751, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/HyeonSeok/BOAZ/venv/lib/python3.11/site-packages/torch/nn/modules/module.py", line 1762, in _call_impl
+    return forward_call(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/HyeonSeok/BOAZ/venv/lib/python3.11/site-packages/torch/nn/modules/container.py", line 240, in forward
+    input = module(input)
+            ^^^^^^^^^^^^^
+  File "/home/HyeonSeok/BOAZ/venv/lib/python3.11/site-packages/torch/nn/modules/module.py", line 1751, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/HyeonSeok/BOAZ/venv/lib/python3.11/site-packages/torch/nn/modules/module.py", line 1762, in _call_impl
+    return forward_call(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/HyeonSeok/BOAZ/venv/lib/python3.11/site-packages/torchvision/models/resnet.py", line 155, in forward
+    out = self.bn3(out)
+          ^^^^^^^^^^^^^
+  File "/home/HyeonSeok/BOAZ/venv/lib/python3.11/site-packages/torch/nn/modules/module.py", line 1751, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/HyeonSeok/BOAZ/venv/lib/python3.11/site-packages/torch/nn/modules/module.py", line 1762, in _call_impl
+    return forward_call(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/HyeonSeok/BOAZ/venv/lib/python3.11/site-packages/torch/nn/modules/batchnorm.py", line 193, in forward
+    return F.batch_norm(
+           ^^^^^^^^^^^^^
+  File "/home/HyeonSeok/BOAZ/venv/lib/python3.11/site-packages/torch/nn/functional.py", line 2822, in batch_norm
+    return torch.batch_norm(
+           ^^^^^^^^^^^^^^^^^
+KeyboardInterrupt

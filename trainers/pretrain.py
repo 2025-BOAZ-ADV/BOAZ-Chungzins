@@ -2,7 +2,7 @@ import torch
 import torch.optim as optim
 from torch.utils.data import DataLoader
 from tqdm import tqdm
-from typing import Dict, Tuple
+from typing import List, Dict, Tuple, Any
 
 from models.moco import MoCo
 from data.augmentation import create_augmenter, apply_spec_augment
@@ -13,12 +13,14 @@ class PretrainTrainer:
     def __init__(
         self,
         model: MoCo,
+        augmentations: [List[Dict[str, Any]]],
         train_loader: DataLoader,
         device: torch.device,
         config: Config,
         logger: WandbLogger = None,
     ):
         self.model = model
+        self.augmentations = augmentations
         self.train_loader = train_loader
         self.device = device
         self.config = config

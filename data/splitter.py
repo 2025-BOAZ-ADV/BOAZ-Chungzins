@@ -1,11 +1,16 @@
 import random
 import pandas as pd
+import numpy as np
+from pathlib import Path
 from typing import List, Tuple, Dict, Union, Literal
+
 import torch
 from torch.utils.data import Subset, Dataset, DataLoader
+
 from config.config import Config
 
-def get_shuffled_filenames(metadata_path: Union[str, Path], option: Literal["pretrain", "finetune"], split_ratio: float = 0.8, seed: int = 42) -> List[str]:
+def get_shuffled_filenames(metadata_path: Union[str, Path], option: Literal["pretrain", "finetune"],
+                            split_ratio: float = 0.8, seed: int = 42) -> List[str]:
     """ICBHI train data를 랜덤 셔플하여 지정된 비율만큼 파일명 리스트 반환
 
     Args:
@@ -20,7 +25,7 @@ def get_shuffled_filenames(metadata_path: Union[str, Path], option: Literal["pre
     random.seed(seed)
 
     # load train data
-    metadata_path = str(metadata_path)
+    metadata_path = Path(metadata_path)
     split_df = pd.read_csv(
         metadata_path / "train_test_split.txt",
         sep='\t',
@@ -60,7 +65,7 @@ def split_cycledataset(dataset: Dataset, filename_list: List[str], seed: int = 4
 
     file_idx = []
     for i in range(len(dataset)):
-        filename = dataset[i][2][0]
+        filename = dataset[i][2]['filename']
         file_idx.append(i)
     
     random.shuffle(file_idx)

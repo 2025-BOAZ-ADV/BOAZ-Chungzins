@@ -1,0 +1,35 @@
+{
+  "os": "Linux-6.1.0-34-cloud-amd64-x86_64-with-glibc2.36",
+  "python": "CPython 3.11.2",
+  "startedAt": "2025-06-09T10:14:24.612635Z",
+  "args": [
+    "--exp",
+    "exp001"
+  ],
+  "program": "/home/HyeonSeok/BOAZ/BOAZ-Chungzins/scripts/run_pretrain.py",
+  "codePath": "scripts/run_pretrain.py",
+  "git": {
+    "remote": "git@github.com:2025-BOAZ-ADV/BOAZ-Chungzins.git",
+    "commit": "90486bc378d9ee85d05865fb9ab2d3c4198352ba"
+  },
+  "email": "vanillahub12@gmail.com",
+  "root": "/home/HyeonSeok/BOAZ/BOAZ-Chungzins",
+  "host": "boaz-vm",
+  "executable": "/home/HyeonSeok/BOAZ/venv/bin/python",
+  "codePathLocal": "scripts/run_pretrain.py",
+  "cpu_count": 4,
+  "cpu_count_logical": 8,
+  "disk": {
+    "/": {
+      "total": "31460429824",
+      "used": "17643962368"
+    }
+  },
+  "memory": {
+    "total": "33664823296"
+  },
+  "cpu": {
+    "count": 4,
+    "countLogical": 8
+  }
+}

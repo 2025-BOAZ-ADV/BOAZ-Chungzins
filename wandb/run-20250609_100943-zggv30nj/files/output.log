@@ -1,0 +1,12 @@
+[INFO] Preprocessing cycles...
+  0%|                                                                                                                                         | 0/539 [00:00<?, ?it/s]
+Traceback (most recent call last):
+  File "/home/HyeonSeok/BOAZ/BOAZ-Chungzins/scripts/run_pretrain.py", line 125, in <module>
+    main()
+  File "/home/HyeonSeok/BOAZ/BOAZ-Chungzins/scripts/run_pretrain.py", line 57, in main
+    train_dataset = CycleDataset(
+                    ^^^^^^^^^^^^^
+  File "/home/HyeonSeok/BOAZ/BOAZ-Chungzins/data/dataset.py", line 110, in __init__
+    mel = generate_mel_spectrogram(normed_wave, sample_rate, frame_size=self.frame_size, hop_length=self.hop_length, n_mels=self.n_mels)
+                                                ^^^^^^^^^^^
+NameError: name 'sample_rate' is not defined

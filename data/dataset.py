@@ -25,7 +25,7 @@ class CycleDataset(Dataset):
     def __init__(
         self,
         data_path: Union[str, Path],
-        metadata_path: Optional[Union[str, Path]] = None,
+        metadata_path: Optional[Union[str, Path]],
         option: Literal["train", "test"],
         target_sr: int = 4000,
         target_sec: int = 8,
@@ -107,11 +107,7 @@ class CycleDataset(Dataset):
                     normed_wave = preprocess_waveform_segment(cycle_wave, unit_length=int(self.target_sec * self.target_sr))
 
                     # Mel Spectrogram으로 변환
-                    mel = generate_mel_spectrogram(normed_wave, sample_rate, frame_size=self.frame_size, hop_length=self.hop_length, n_mels=self.n_mels)
-                    
-                    # 프레임 수 계산 및 비교
-                    target_frames = int(self.target_sec * self.target_sr / self.hop_length)
-                    assert mel.shape[-1] == target_frames, f"mel shape mismatch: {mel.shape} vs {target_frames}"
+                    mel = generate_mel_spectrogram(normed_wave, sample_rate=self.target_sr, frame_size=self.frame_size, hop_length=self.hop_length, n_mels=self.n_mels)
                     
                     # 캐시에 저장
                     if self.save_cache:

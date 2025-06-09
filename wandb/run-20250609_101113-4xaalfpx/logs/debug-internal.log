@@ -1,0 +1,15 @@
+{"time":"2025-06-09T10:11:13.935244043Z","level":"INFO","msg":"stream: starting","core version":"0.20.1","symlink path":"/home/HyeonSeok/BOAZ/BOAZ-Chungzins/wandb/run-20250609_101113-4xaalfpx/logs/debug-core.log"}
+{"time":"2025-06-09T10:11:14.239454186Z","level":"INFO","msg":"stream: created new stream","id":"4xaalfpx"}
+{"time":"2025-06-09T10:11:14.239482144Z","level":"INFO","msg":"stream: started","id":"4xaalfpx"}
+{"time":"2025-06-09T10:11:14.239496209Z","level":"INFO","msg":"writer: Do: started","stream_id":"4xaalfpx"}
+{"time":"2025-06-09T10:11:14.239520468Z","level":"INFO","msg":"sender: started","stream_id":"4xaalfpx"}
+{"time":"2025-06-09T10:11:14.239545303Z","level":"INFO","msg":"handler: started","stream_id":"4xaalfpx"}
+{"time":"2025-06-09T10:11:14.595476423Z","level":"INFO","msg":"Starting system monitor"}
+{"time":"2025-06-09T10:11:14.754479249Z","level":"INFO","msg":"stream: closing","id":"4xaalfpx"}
+{"time":"2025-06-09T10:11:14.754511485Z","level":"INFO","msg":"Stopping system monitor"}
+{"time":"2025-06-09T10:11:14.754590306Z","level":"INFO","msg":"Stopped system monitor"}
+{"time":"2025-06-09T10:11:15.938117732Z","level":"INFO","msg":"fileTransfer: Close: file transfer manager closed"}
+{"time":"2025-06-09T10:11:16.174959693Z","level":"INFO","msg":"handler: closed","stream_id":"4xaalfpx"}
+{"time":"2025-06-09T10:11:16.174974307Z","level":"INFO","msg":"writer: Close: closed","stream_id":"4xaalfpx"}
+{"time":"2025-06-09T10:11:16.174996797Z","level":"INFO","msg":"sender: closed","stream_id":"4xaalfpx"}
+{"time":"2025-06-09T10:11:16.175027297Z","level":"INFO","msg":"stream: closed","id":"4xaalfpx"}
