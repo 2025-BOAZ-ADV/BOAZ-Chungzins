@@ -28,7 +28,8 @@ def main():
     
     # 실험 설정 로드
     exp_module = import_module(f'scripts.experiments.{args.exp}')
-    config = exp_module.ExperimentConfig
+    exp_cfg = exp_module.ExperimentConfig(str(args.exp))
+    fnt_cfg = exp_cfg.finetune
     
     # 디렉토리 생성
     checkpoints_dir = project_root / 'checkpoints' / args.exp
@@ -36,9 +37,10 @@ def main():
     
     # wandb 초기화
     logger = WandbLogger(
-        project_name=f"{config.wandb_project}-finetune",
-        entity=config.wandb_entity,
-        config=vars(config.finetune)
+        project_name=exp_cfg.wandb_project,
+        experiment_name=exp_cfg.step2_experiment_name,
+        config=vars(ftn_cfg),
+        entity=exp_cfg.wandb_entity
     )
     
     # 디바이스 설정
@@ -53,11 +55,11 @@ def main():
         data_path=str(data_path),
         metadata_path=str(metadata_path),
         option="train",
-        target_sr=ssl_config.target_sr,
-        target_sec=ssl_config.target_sec,
-        frame_size=ssl_config.frame_size,
-        hop_length=ssl_config.hop_length,
-        n_mels=ssl_config.n_mels,
+        target_sr=ftn_cfg.target_sr,
+        target_sec=ftn_cfg.target_sec,
+        frame_size=ftn_cfg.frame_size,
+        hop_length=ftn_cfg.hop_length,
+        n_mels=ftn_cfg.n_mels,
         use_cache=False,    # 추후 True로 바꾸기
         save_cache=True
     )
@@ -66,13 +68,13 @@ def main():
     finetune_filename_list = get_shuffled_filenames(
         metadata_path=str(metadata_path),
         option="finetune",
-        split_ratio=config.split_ratio,
-        seed=config.seed
+        split_ratio=exp_cfg.split_ratio,
+        seed=exp_cfg.seed
     )
     finetune_dataset = split_cycledataset(
         train_dataset,
         finetune_filename_list,
-        seed=config.seed
+        seed=exp_cfg.seed
     )
     
     ##### 파인튜닝용 데이터셋 내에서 다시 train-validation split #####
@@ -81,7 +83,7 @@ def main():
         # train-val filename split
         train_file_list, val_file_list = train_test_split(
             finetune_filename_list,
-            test_size=config.val_ratio,
+            test_size=exp_cfg.val_ratio,
             random_state=42
         )
     
@@ -95,8 +97,8 @@ def main():
         dataloaders = create_dataloaders(
             train_dataset=torch.utils.data.Subset(train_dataset, train_indices),
             val_dataset=torch.utils.data.Subset(train_dataset, val_indices),
-            batch_size=config.finetune.batch_size,
-            num_workers=config.finetune.num_workers
+            batch_size=fnt_cfg.batch_size,
+            num_workers=fnt_cfg.num_workers
         )
 
         train_loader = dataloaders['train']
@@ -105,9 +107,9 @@ def main():
     else:
         train_loader = torch.utils.data.DataLoader(
             finetune_dataset,
-            batch_size=config.finetune.batch_size,
+            batch_size=fnt_cfg.batch_size,
             shuffle=False,      # 추후 개선할 부분, 이미 dataset이 한번 셔플된 상태
-            num_workers=0 if device.type == 'cpu' else config.finetune.num_workers,
+            num_workers=0 if device.type == 'cpu' else fnt_cfg.num_workers,
             pin_memory=torch.cuda.is_available(),
             drop_last=True      # 추후 개선할 부분
         )
@@ -117,10 +119,9 @@ def main():
     
     # 모델 생성
     model = create_classifier(
-        ssl_checkpoint=args.ssl_checkpoint,
-        num_classes=2,  # Crackle, Wheeze
-        freeze_backbone=config.finetune.freeze_backbone,
-        dropout_rate=config.finetune.dropout_rate
+        checkpoint_path=args.ssl_checkpoint,
+        classifier=fnt_cfg.classifier,
+        freeze_backbone=fnt_cfg.freeze_backbone
     ).to(device)
     
     # 체크포인트에서 재시작
@@ -135,7 +136,7 @@ def main():
     trainer = FinetuneTrainer(
         model=model,
         device=device,
-        config=config.finetune,
+        config=ftn_cfg,
         train_loader=train_loader,
         val_loader=val_loader,
         logger=logger
@@ -143,7 +144,7 @@ def main():
     
     # 학습 실행
     history = trainer.train(
-        epochs=config.finetune.epochs - start_epoch,
+        epochs=fnt_cfg.epochs - start_epoch,
         save_path=str(checkpoints_dir)
     )
     

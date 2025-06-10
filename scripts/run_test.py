@@ -27,17 +27,18 @@ def main():
     
     # 실험 설정 로드
     exp_module = import_module(f'scripts.experiments.{args.exp}')
-    config = exp_module.ExperimentConfig
+    exp_cfg = exp_module.ExperimentConfig(str(args.exp))
+    fnt_cfg = exp_cfg.finetune
     
     # 디렉토리 생성
-    out_dir = Path(config.checkpoint_dir)
+    out_dir = Path(exp_cfg.checkpoint_dir)
     out_dir.mkdir(parents=True, exist_ok=True)
     
     # wandb 초기화
     logger = WandbLogger(
-        project_name=f"{config.wandb_project}-test",
-        entity=config.wandb_entity,
-        config=vars(config.finetune)
+        project_name=f"{exp_cfg.wandb_project}-test",
+        entity=exp_cfg.wandb_entity,
+        config=vars(ftn_cfg)
     )
     
     # 디바이스 설정
@@ -52,11 +53,11 @@ def main():
         data_path=str(data_path),
         metadata_path=str(metadata_path),
         option="test",
-        target_sr=ssl_config.target_sr,
-        target_sec=ssl_config.target_sec,
-        frame_size=ssl_config.frame_size,
-        hop_length=ssl_config.hop_length,
-        n_mels=ssl_config.n_mels,
+        target_sr=ftn_cfg.target_sr,
+        target_sec=ftn_cfg.target_sec,
+        frame_size=ftn_cfg.frame_size,
+        hop_length=ftn_cfg.hop_length,
+        n_mels=ftn_cfg.n_mels,
         use_cache=False,    # 추후 True로 바꾸기
         save_cache=True
     )
@@ -64,19 +65,18 @@ def main():
     # DataLoader 생성
     test_loader = torch.utils.data.DataLoader(
         test_dataset,
-        batch_size=ssl_config.batch_size,
+        batch_size=ftn_cfg.batch_size,
         shuffle=False,      # 추후 개선할 부분, 이미 dataset이 한번 셔플된 상태
-        num_workers=0 if device.type == 'cpu' else ssl_config.num_workers,
+        num_workers=0 if device.type == 'cpu' else ftn_cfg.num_workers,
         pin_memory=torch.cuda.is_available(),
         drop_last=True      # 추후 개선할 부분
     )
 
-    # 모델 생성 (Classifier까지 훈련된 것을 가져옴)
+    # 모델 생성 (분류기까지 훈련된 것의 경로를 가져옴)
     model = create_classifier(
-        ssl_checkpoint=args.ssl_checkpoint,
-        num_classes=2,  # Crackle, Wheeze
-        freeze_backbone=config.finetune.freeze_backbone,
-        dropout_rate=config.finetune.dropout_rate
+        checkpoint_path=args.ssl_checkpoint,
+        classifier=ftn_cfg.classifier,
+        freeze_backbone=ftn_cfg.freeze_backbone
     ).to(device)
     
     # 평가 모드 전환

@@ -11,7 +11,7 @@ from data.splitter import get_shuffled_filenames, split_cycledataset
 from models.backbone import create_backbone
 from models.moco import MoCo
 from trainers.pretrain import PretrainTrainer
-from utils.logger import WandbLogger
+from utils.logger import get_timestamp, WandbLogger
 
 def parse_args():
     parser = argparse.ArgumentParser(description='STEP 1. Pretraining')
@@ -29,21 +29,19 @@ def main():
     
     # 실험 설정 로드
     exp_module = import_module(f'scripts.experiments.{args.exp}')
-    config = exp_module.ExperimentConfig
-    ssl_config = config.ssl()  # 인스턴스화
+    exp_cfg = exp_module.ExperimentConfig(str(args.exp))
+    ssl_cfg = exp_cfg.ssl
     
     # 디렉토리 생성
     checkpoints_dir = project_root / 'checkpoints' / args.exp
     checkpoints_dir.mkdir(parents=True, exist_ok=True)
     
-    wandb_dir = project_root / 'wandb_logs'
-    wandb_dir.mkdir(parents=True, exist_ok=True)
-    
     # wandb 초기화
     logger = WandbLogger(
-        project_name=f"{config.wandb_project}-pretrain",
-        config=vars(ssl_config),
-        entity=config.wandb_entity
+        project_name=exp_cfg.wandb_project,
+        experiment_name=exp_cfg.step1_experiment_name,
+        config=vars(ssl_cfg),
+        entity=exp_cfg.wandb_entity
     )
     
     # 디바이스 설정
@@ -58,11 +56,11 @@ def main():
         data_path=str(data_path),
         metadata_path=str(metadata_path),
         option="train",
-        target_sr=ssl_config.target_sr,
-        target_sec=ssl_config.target_sec,
-        frame_size=ssl_config.frame_size,
-        hop_length=ssl_config.hop_length,
-        n_mels=ssl_config.n_mels,
+        target_sr=ssl_cfg.target_sr,
+        target_sec=ssl_cfg.target_sec,
+        frame_size=ssl_cfg.frame_size,
+        hop_length=ssl_cfg.hop_length,
+        n_mels=ssl_cfg.n_mels,
         use_cache=False,    
         save_cache=True
     )
@@ -71,21 +69,21 @@ def main():
     pretrain_filename_list = get_shuffled_filenames(
         metadata_path=str(metadata_path),
         option="pretrain",
-        split_ratio=config.split_ratio,
-        seed=config.seed
+        split_ratio=exp_cfg.split_ratio,
+        seed=exp_cfg.seed
     )
     pretrain_dataset = split_cycledataset(
         train_dataset,
         pretrain_filename_list,
-        seed=config.seed
+        seed=exp_cfg.seed
     )
 
     # DataLoader 생성
     pretrain_loader = torch.utils.data.DataLoader(
         pretrain_dataset,
-        batch_size=ssl_config.batch_size,
+        batch_size=ssl_cfg.batch_size,
         shuffle=False,      # 추후 개선할 부분, 이미 dataset이 한번 셔플된 상태
-        num_workers=0 if device.type == 'cpu' else ssl_config.num_workers,
+        num_workers=0 if device.type == 'cpu' else ssl_cfg.num_workers,
         pin_memory=torch.cuda.is_available(),
         drop_last=True      # 추후 개선할 부분
     )
@@ -106,16 +104,16 @@ def main():
     # Trainer 생성
     trainer = PretrainTrainer(
         model=model,
-        augmentations=ssl_config.augmentations,
+        augmentations=ssl_cfg.augmentations,
         train_loader=pretrain_loader,
         device=device,
-        config=ssl_config,
+        config=ssl_cfg,
         logger=logger
     )
     
     # 학습 실행
     history = trainer.train(
-        epochs=ssl_config.epochs - start_epoch,
+        epochs=ssl_cfg.epochs - start_epoch,
         save_path=str(checkpoints_dir)
     )
     

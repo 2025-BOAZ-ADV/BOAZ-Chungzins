@@ -1,17 +1,25 @@
 import wandb
 from typing import Dict, Any
+from zoneinfo import ZoneInfo
+
+def get_timestamp():
+    """Outputs current time in KST like 06091830"""
+    kst_time = datetime.now(ZoneInfo("Asia/Seoul"))
+    return kst_time.strftime('%m%d%H%M')
 
 class WandbLogger:
-    def __init__(self, project_name: str, config: Dict[str, Any] = None, entity: str = None):
+    def __init__(self, project_name: str, experiment_name: str, config: Dict[str, Any] = None, entity: str = None):
         """Weights & Biases 로거 초기화
         
         Args:
             project_name: wandb 프로젝트 이름
+            experiment_name: 실험 이름
             config: 설정값 딕셔너리
             entity: wandb entity(팀/계정명)
         """
         self.run = wandb.init(
             project=project_name,
+            name=experiment_name,
             entity=entity,
             config=config
         )
