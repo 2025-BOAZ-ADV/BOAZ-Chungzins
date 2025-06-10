@@ -11,7 +11,6 @@ from tqdm import tqdm
 
 from data.cache import DataCache
 from data.preprocessor import resample_waveform, generate_mel_spectrogram, preprocess_waveform_segment, get_class
-from config.config import Config
 
 
 class CycleDataset(Dataset):
@@ -147,6 +146,7 @@ class CycleDataset(Dataset):
         return mel, multi_label, meta_data
 
 
+### 현재는 사용하지 않음
 class MoCoCycleDataset(CycleDataset):
     """현재 사용하지 않습니다."""
     def __getitem__(self, idx: int) -> Tuple[torch.Tensor, torch.Tensor, int]:

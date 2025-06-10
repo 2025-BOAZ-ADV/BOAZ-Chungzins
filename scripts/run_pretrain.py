@@ -90,7 +90,8 @@ def main():
     
     # Multi-label MoCo 모델 생성
     model = MoCo(
-        base_encoder=create_backbone
+        base_encoder=create_backbone,
+        config=ssl_cfg
     ).to(device)
     
     # 체크포인트에서 재시작

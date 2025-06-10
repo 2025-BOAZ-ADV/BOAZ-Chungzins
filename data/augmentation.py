@@ -2,7 +2,7 @@ import torch
 import torchaudio.transforms as T
 import random
 import math
-from typing import List, Dict, Any, Optional
+from typing import List, Dict, Any, Optional, Union
 from config.config import Config
 
 class AugmentationBase:
@@ -137,7 +137,7 @@ class AugmentationComposer:
         """
         return [self.__call__(mel) for _ in range(num_views)]
 
-def create_augmenter(config: Config, augmentations: [List[Dict[str, Any]]]) -> AugmentationComposer:
+def create_augmenter(config: Union[Config, SSLConfig], augmentations: [List[Dict[str, Any]]]) -> AugmentationComposer:
     """증강기 생성
     
     Args:

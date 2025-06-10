@@ -1,20 +1,22 @@
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-from config.config import Config
 
 class MoCo(nn.Module):
-    def __init__(self, base_encoder):
+    def __init__(self, base_encoder, config):
         """MoCo v2 모델 초기화
         Args:
-            base_encoder (callable): 백본 네트워크 생성 함수
+            base_encoder : 백본 네트워크 생성 함수
+            config: 실험 설정
         """
         super().__init__()
-        self.K = Config.K
-        self.m = Config.m
-        self.T = Config.T
-        self.top_k = Config.top_k
-        self.lambda_bce = Config.lambda_bce
+        self.K = config.K
+        self.m = config.m
+        self.T = config.T
+        self.top_k = config.top_k
+        self.lambda_bce = config.lambda_bce
+        self.dim_mlp = config.dim_mlp
+        self.warmup_epochs = config.warmup_epochs
 
         # 인코더 생성
         self.encoder_q = base_encoder()  # query encoder
@@ -22,7 +24,7 @@ class MoCo(nn.Module):
 
         # projection head 생성
         dim_enc = 2048  # ResNet50의 출력 차원
-        dim_prj = Config.dim_mlp  # projection head의 출력 차원
+        dim_prj = self.dim_mlp  # projection head의 출력 차원
 
         self.proj_head_q = nn.Sequential(
             nn.Linear(dim_enc, dim_enc),
@@ -106,7 +108,7 @@ class MoCo(nn.Module):
         info_nce_loss = F.cross_entropy(logits, labels)
 
         # Total loss (with optional warmup)
-        if epoch is not None and epoch < Config.warmup_epochs:
+        if epoch is not None and epoch < self.warmup_epochs:
             loss = info_nce_loss
         else:
             loss = info_nce_loss + self.lambda_bce * bce_loss

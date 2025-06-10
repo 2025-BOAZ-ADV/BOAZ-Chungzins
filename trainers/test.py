@@ -3,12 +3,11 @@ import torch.nn as nn
 import torch.optim as optim
 from torch.utils.data import DataLoader
 from tqdm import tqdm
-from typing import Dict, Tuple, Optional
+from typing import Dict, Tuple, Optional, Union
 from sklearn.metrics import f1_score
 
 from models.classifier import LungSoundClassifier
 from utils.logger import WandbLogger
-from config.config import Config
 
 class TestRunner:
     def __init__(

@@ -7,8 +7,6 @@ from typing import List, Tuple, Dict, Union, Literal
 import torch
 from torch.utils.data import Subset, Dataset, DataLoader
 
-from config.config import Config
-
 def get_shuffled_filenames(metadata_path: Union[str, Path], option: Literal["pretrain", "finetune"],
                             split_ratio: float = 0.8, seed: int = 42) -> List[str]:
     """ICBHI train data를 랜덤 셔플하여 지정된 비율만큼 파일명 리스트 반환
@@ -75,8 +73,8 @@ def split_cycledataset(dataset: Dataset, filename_list: List[str], seed: int = 4
 
 def create_dataloaders(pretext_dataset: Dataset, 
                       finetune_dataset: Dataset,
-                      batch_size: int = Config.batch_size,
-                      num_workers: int = Config.num_workers) -> Dict[str, DataLoader]:
+                      batch_size: int,
+                      num_workers: int) -> Dict[str, DataLoader]:
     """데이터로더 생성
     
     Args:

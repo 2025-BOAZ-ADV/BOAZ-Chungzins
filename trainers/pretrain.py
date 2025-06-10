@@ -2,7 +2,7 @@ import torch
 import torch.optim as optim
 from torch.utils.data import DataLoader
 from tqdm import tqdm
-from typing import List, Dict, Tuple, Any
+from typing import List, Dict, Tuple, Any, Union
 
 from models.moco import MoCo
 from data.augmentation import create_augmenter, apply_spec_augment
@@ -16,7 +16,7 @@ class PretrainTrainer:
         augmentations: [List[Dict[str, Any]]],
         train_loader: DataLoader,
         device: torch.device,
-        config: Config,
+        config: Union[Config, SSLConfig],
         logger: WandbLogger = None,
     ):
         self.model = model

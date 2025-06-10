@@ -3,7 +3,7 @@ import torch.nn as nn
 import torch.optim as optim
 from torch.utils.data import DataLoader
 from tqdm import tqdm
-from typing import Dict, Tuple, Optional
+from typing import Dict, Tuple, Optional, Union
 from sklearn.metrics import f1_score
 
 from models.classifier import LungSoundClassifier
@@ -15,7 +15,7 @@ class FinetuneTrainer:
         self,
         model: LungSoundClassifier,
         device: torch.device,
-        config: Config,
+        config: Union[Config, FinetuneConfig],
         train_loader: DataLoader,
         val_loader: Optional[DataLoader] = None,
         logger: WandbLogger = None
