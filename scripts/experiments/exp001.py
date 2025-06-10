@@ -94,26 +94,26 @@ class ExperimentConfig:
         
         # 사전훈련 실험 이름
         self.step1_experiment_name = (
-            f"{self.exp_name}-pretrain-"
-            f"{self.ssl.batch_size}bs-{self.ssl.target_sr}sr-"
+            f"{self.exp_name}-prt-"
+            f"{self.ssl.batch_size}bs-{self.ssl.target_sr//1000}KHz-"
             f"top{self.ssl.top_k}-{self.ssl.K}K-"
-            f"{self.dim_mlp}dim-{self.ssl.lambda_bce}ld-"
+            f"{self.ssl.dim_mlp}dim-{self.ssl.lambda_bce}ld-"
             f"{get_timestamp()}"
         )
 
         # 파인튜닝 실험 이름
         self.step2_experiment_name = (
-            f"{self.exp_name}-finetune-"
-            f"{self.ssl.batch_size}bs-{self.ssl.target_sr}sr-"
-            f"{self.num_layers}layer-{self.dropout_rate}dr-"
+            f"{self.exp_name}-fnt-"
+            f"{self.finetune.batch_size}bs-{self.finetune.target_sr//1000}KHz-"
+            f"{self.finetune.num_layers}ly-{self.finetune.dropout_rate}dr-"
             f"{get_timestamp()}"
         )
 
         # 성능평가 실험 이름
         self.step3_experiment_name = (
             f"{self.exp_name}-test-"
-            f"{self.ssl.batch_size}bs-{self.ssl.target_sr}sr-"
-            f"{self.num_layers}layer-{self.dropout_rate}dr-"
+            f"{self.finetune.batch_size}bs-{self.finetune.target_sr//1000}KHz-"
+            f"{self.finetune.num_layers}ly-{self.finetune.dropout_rate}dr-"
             f"{get_timestamp()}"
         )
 
