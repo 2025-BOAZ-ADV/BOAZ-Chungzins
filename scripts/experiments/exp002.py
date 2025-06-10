@@ -1,3 +1,6 @@
+"""아직 사용하지 않습니다. 현재는 exp001.py만 사용합니다. (2025/06/11)"""
+
+
 """실험 002: 다양한 데이터 증강"""
 
 from config.base_config import BaseConfig

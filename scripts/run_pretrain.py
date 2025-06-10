@@ -2,9 +2,10 @@
 
 import os
 import argparse
-from pathlib import Path
 import torch
+from torchsummary import summary
 from importlib import import_module
+from pathlib import Path
 
 from data.dataset import CycleDataset
 from data.splitter import get_shuffled_filenames, split_cycledataset
@@ -61,8 +62,8 @@ def main():
         frame_size=ssl_cfg.frame_size,
         hop_length=ssl_cfg.hop_length,
         n_mels=ssl_cfg.n_mels,
-        use_cache=False,    
-        save_cache=True
+        use_cache=ssl_cfg.use_cache,    
+        save_cache=ssl_cfg.save_cache
     )
 
     # train data의 일부를 가져와 사전훈련용 데이터셋 구축
@@ -73,8 +74,8 @@ def main():
         seed=exp_cfg.seed
     )
     pretrain_dataset = split_cycledataset(
-        train_dataset,
-        pretrain_filename_list,
+        train_dataset=train_dataset,
+        filename_list=pretrain_filename_list,
         seed=exp_cfg.seed
     )
 
@@ -93,6 +94,10 @@ def main():
         base_encoder=create_backbone,
         config=ssl_cfg
     ).to(device)
+
+    # ResNet 내부 구조 출력
+    mel_spectrogram_shape = train_dataset[0][0].shape   # mel spectrogram 1개의 shape: (1, 높이, 너비)
+    print(summary(create_backbone().to(device), input_size=mel_spectrogram_shape))
     
     # 체크포인트에서 재시작
     start_epoch = 0

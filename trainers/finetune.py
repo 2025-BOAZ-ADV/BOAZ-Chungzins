@@ -3,11 +3,11 @@ import torch.nn as nn
 import torch.optim as optim
 from torch.utils.data import DataLoader
 from tqdm import tqdm
-from typing import Dict, Tuple, Optional, Union
+from typing import Dict, Tuple, Optional, Any, Union
 from sklearn.metrics import f1_score
 
 from models.classifier import LungSoundClassifier
-from utils.logger import WandbLogger
+from utils.logger import get_timestamp, WandbLogger
 from config.config import Config
 
 class FinetuneTrainer:
@@ -28,14 +28,14 @@ class FinetuneTrainer:
         self.logger = logger
         
         # Binary Cross Entropy for multi-label classification
-        # --------------- 나중에 Focal Loss로 수정할 수 있음 ---------------
+        # --------------- 나중에 Focal Loss로 수정할 수 있음! ---------------
         self.criterion = nn.BCEWithLogitsLoss()
         
         # Optimizer
         self.optimizer = optim.AdamW(
             self.model.parameters(),
-            lr=config.finetune_lr,
-            weight_decay=config.finetune_weight_decay
+            lr=config.learning_rate,
+            weight_decay=config.weight_decay
         )
         
         # Learning Rate Scheduler
@@ -44,12 +44,18 @@ class FinetuneTrainer:
             T_max=config.epochs
         )
 
+        # Validation Loader 입력 여부 출력
+        if not isinstance(self.val_loader, DataLoader):
+            self.is_val_loader = False
+            print("[INFO] Validation set이 없으므로 모든 데이터를 Training에 사용합니다.")
+
     def train_epoch(self) -> Tuple[float, float]:
         """한 epoch 학습
         
         Returns:
             loss, f1 score
         """
+        # 훈련 모드 전환 (Dropout, Batchnorm 적용)
         self.model.train()
         total_loss = 0
         all_preds = []
@@ -68,7 +74,7 @@ class FinetuneTrainer:
             loss.backward()
             self.optimizer.step()
             
-            # 통계
+            # loss 합산 및 정답/예측 label 저장
             total_loss += loss.item()
             preds = (torch.sigmoid(outputs) > 0.5).float()
             all_preds.extend(preds.cpu().numpy())
@@ -89,12 +95,12 @@ class FinetuneTrainer:
         Returns:
             validation loss, f1 score
         """
+        # 평가 모드 전환 (Dropout, BatchNorm 스킵)
         self.model.eval()
 
-        # Validation Loader를 입력받지 않을 경우 Validation을 건너뛰고 Train loss만 계산됨
-        if not isinstance(self.val_loader, DataLoader):
-            print("=========== No Validation Loader ===========")
-            return 0.0, 0.0
+        # Validation Loader를 입력받지 않을 경우 Validation 스킵
+        if self.is_val_loader == False:
+            return -1.0, -1.0
 
         total_loss = 0
         all_preds = []
@@ -130,6 +136,7 @@ class FinetuneTrainer:
             'train_loss': [], 'train_f1': [],
             'val_loss': [], 'val_f1': []
         }
+        best_train_f1 = 0.0
         best_val_f1 = 0.0
         
         for epoch in range(epochs):
@@ -150,28 +157,51 @@ class FinetuneTrainer:
             
             # logging
             if self.logger:
-                self.logger.log({
-                    'epoch': epoch,
-                    'train_loss': train_loss,
-                    'train_f1': train_f1,
-                    'val_loss': val_loss,
-                    'val_f1': val_f1,
-                    'learning_rate': self.optimizer.param_groups[0]['lr']
-                })
-            
-            # save best model
-            if save_path and val_f1 > best_val_f1:
-                best_val_f1 = val_f1
-                torch.save({
-                    'epoch': epoch,
-                    'model_state_dict': self.model.state_dict(),
-                    'optimizer_state_dict': self.optimizer.state_dict(),
-                    'scheduler_state_dict': self.scheduler.state_dict(),
-                    'best_val_f1': best_val_f1,
-                }, f'{save_path}/best_finetuned_model.pth')
+                if self.is_val_loader == False:
+                    self.logger.log({
+                        'Finetune/epoch': epoch,
+                        'Finetune/train_loss': train_loss,
+                        'Finetune/train_f1': train_f1,
+                        'Finetune/learning_rate': self.optimizer.param_groups[0]['lr']
+                    })
+                else:
+                    self.logger.log({
+                        'Finetune/epoch': epoch,
+                        'Finetune/train_loss': train_loss,
+                        'Finetune/train_f1': train_f1,
+                        'Finetune/val_loss': val_loss,
+                        'Finetune/val_f1': val_f1,
+                        'Finetune/learning_rate': self.optimizer.param_groups[0]['lr']
+                    })
+                
+            if save_path:
+                # Validation Loader를 입력받지 않은 경우, Train F1 Score 기준으로 best model 저장
+                if self.is_val_loader == False:
+                    if train_f1 > best_train_f1:
+                        best_train_f1 = train_f1
+                        torch.save({
+                            'epoch': epoch,
+                            'model_state_dict': self.model.state_dict(),
+                            'optimizer_state_dict': self.optimizer.state_dict(),
+                            'scheduler_state_dict': self.scheduler.state_dict(),
+                            'best_val_f1': best_val_f1,
+                        }, f'{save_path}/best_finetuned_model_{get_timestamp()}.pth')
+
+                # Validation Loader를 입력받은 경우, Validation F1 Score와 비교하여 best model 저장
+                elif val_f1 > best_val_f1:
+                    best_val_f1 = val_f1
+                    torch.save({
+                        'epoch': epoch,
+                        'model_state_dict': self.model.state_dict(),
+                        'optimizer_state_dict': self.optimizer.state_dict(),
+                        'scheduler_state_dict': self.scheduler.state_dict(),
+                        'best_val_f1': best_val_f1,
+                    }, f'{save_path}/best_finetuned_model_{get_timestamp()}.pth')
             
             print(f'Epoch {epoch}:')
             print(f'Train - Loss: {train_loss:.4f}, F1: {train_f1:.4f}')
-            print(f'Val - Loss: {val_loss:.4f}, F1: {val_f1:.4f}')
+
+            if self.is_val_loader == True:
+                print(f'Val - Loss: {val_loss:.4f}, F1: {val_f1:.4f}')
         
         return history

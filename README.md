@@ -88,19 +88,19 @@ wandb login --relogin (본인의 API key)
 ### 4. 실험 실행  
 아래와 같은 구문을 bash에 입력하여 각 단계별로 학습/평가를 수행합니다.  
 
-**STEP 1. Pretraining**  필수 인자: `--exp`: 실험 세팅값  
+**STEP 1. Pretraining**  (필수 인자: `--exp`: 실험 세팅값)  
 ```bash
 PYTHONPATH=. python scripts/run_pretrain.py --exp exp001
 ```
 
-**STEP 2. Fine-tuning**  필수 인자: `--exp`: 실험 세팅값, `--ssl-checkpoint`: 사전훈련 인코더 가중치 경로  
+**STEP 2. Fine-tuning**  (필수 인자: `--exp`: 실험 세팅값, `--ssl-checkpoint`: 사전훈련 인코더 가중치 경로)  
 ```bash
-PYTHONPATH=. python scripts/run_finetune.py --exp exp001 --ssl-checkpoint /checkpoints/exp001/best_pretrained_model.pth
+PYTHONPATH=. python scripts/run_finetune.py --exp exp001 --ssl-checkpoint checkpoints/exp001/best_pretrained_model_(timestamp).pth
 ```
 
-**STEP 3. Test**  필수 인자: `--exp`: 실험 세팅값, `--ssl-checkpoint`: 사전훈련 인코더+분류기 가중치 경로  
+**STEP 3. Test**  (필수 인자: `--exp`: 실험 세팅값, `--ssl-checkpoint`: 사전훈련 인코더+분류기 가중치 경로)  
 ```bash
-PYTHONPATH=. python scripts/run_test.py --exp exp001 --ssl-checkpoint /checkpoints/exp001/best_finetuned_model.pth
+PYTHONPATH=. python scripts/run_test.py --exp exp001 --ssl-checkpoint checkpoints/exp001/best_finetuned_model_(timestamp).pth
 ```
 
 **EDA(Exploratory Data Analysis) 실행**

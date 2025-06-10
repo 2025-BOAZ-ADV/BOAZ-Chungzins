@@ -25,10 +25,14 @@ def parse_args():
 
 def main():
     args = parse_args()
+
+    # 현재 프로젝트 루트 디렉토리 설정
+    project_root = Path(__file__).parent.parent
     
     # 실험 설정 로드
     exp_module = import_module(f'scripts.experiments.{args.exp}')
     exp_cfg = exp_module.ExperimentConfig(str(args.exp))
+    ssl_cfg = exp_cfg.ssl
     fnt_cfg = exp_cfg.finetune
     
     # 디렉토리 생성
@@ -39,7 +43,7 @@ def main():
     logger = WandbLogger(
         project_name=exp_cfg.wandb_project,
         experiment_name=exp_cfg.step2_experiment_name,
-        config=vars(ftn_cfg),
+        config=vars(fnt_cfg),
         entity=exp_cfg.wandb_entity
     )
     
@@ -55,13 +59,13 @@ def main():
         data_path=str(data_path),
         metadata_path=str(metadata_path),
         option="train",
-        target_sr=ftn_cfg.target_sr,
-        target_sec=ftn_cfg.target_sec,
-        frame_size=ftn_cfg.frame_size,
-        hop_length=ftn_cfg.hop_length,
-        n_mels=ftn_cfg.n_mels,
-        use_cache=False,    # 추후 True로 바꾸기
-        save_cache=True
+        target_sr=fnt_cfg.target_sr,
+        target_sec=fnt_cfg.target_sec,
+        frame_size=fnt_cfg.frame_size,
+        hop_length=fnt_cfg.hop_length,
+        n_mels=fnt_cfg.n_mels,
+        use_cache=fnt_cfg.use_cache,   
+        save_cache=fnt_cfg.save_cache
     )
     
     # train data의 일부를 가져와 파인튜닝용 데이터셋 구축
@@ -79,12 +83,12 @@ def main():
     
     ##### 파인튜닝용 데이터셋 내에서 다시 train-validation split #####
     ##### 현재는 하지 않습니다. 테스트도 아직 안 한 상태 (기본값=False) #####
-    if allow_val == True: 
+    if exp_cfg.allow_val == True: 
         # train-val filename split
         train_file_list, val_file_list = train_test_split(
             finetune_filename_list,
             test_size=exp_cfg.val_ratio,
-            random_state=42
+            random_state=exp_cfg.seed
         )
     
         # train-val idx split
@@ -120,8 +124,9 @@ def main():
     # 모델 생성
     model = create_classifier(
         checkpoint_path=args.ssl_checkpoint,
+        backbone_config=ssl_cfg,
         classifier=fnt_cfg.classifier,
-        freeze_backbone=fnt_cfg.freeze_backbone
+        freeze_encoder=fnt_cfg.freeze_encoder
     ).to(device)
     
     # 체크포인트에서 재시작
@@ -136,7 +141,7 @@ def main():
     trainer = FinetuneTrainer(
         model=model,
         device=device,
-        config=ftn_cfg,
+        config=fnt_cfg,
         train_loader=train_loader,
         val_loader=val_loader,
         logger=logger

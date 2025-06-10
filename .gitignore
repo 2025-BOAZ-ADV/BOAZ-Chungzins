@@ -1,4 +1,7 @@
 *.wav
-__pycache__/
+*.pth
 *.pyc
+__pycache__/
+checkpoints/
+processed/
 wandb/

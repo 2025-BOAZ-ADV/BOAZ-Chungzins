@@ -16,7 +16,16 @@ from data.preprocessor import resample_waveform, generate_mel_spectrogram, prepr
 class CycleDataset(Dataset):
     """호흡 사이클들을 Mel Spectrogram으로 변환하여 저장
     Args:
-        (작성 필요)
+        data_path: 오디오 데이터 경로
+        metadata_path: 메타데이터 경로
+        option: train or test (ICBHI 공식 분할 기준)
+        target_sr: 통일할 샘플링 레이트
+        target_sec: 고정할 오디오 길이
+        frame_size: FFT 크기 (=윈도우 길이)
+        hop_length: 프레임 간 간격 (작을수록 더 촘촘하게 분석, 보통 frame_size의 절반)
+        n_mels: mel filter 개수
+        use_cache: 오디오 파일을 변환한 캐시 파일 사용 여부
+        save_cache: 변환된 캐시 파일 저장 여부
     Returns:
         mel (torch.Tensor): Mel Spectrogram (dB 스케일), augmentation 됐을 경우 (확인 필요)
         mel_data (Dict): 호흡 사이클의 메타데이터 (파일명, 호흡음 길이, 환자 번호, multi_label)
@@ -76,8 +85,7 @@ class CycleDataset(Dataset):
 
             # 청진음 데이터 로드
             waveform, orig_sr = torchaudio.load(wav_path)
-            if waveform.shape[0] > 1:  # 스테레오를 모노로 변환
-                waveform = torch.mean(waveform, dim=0, keepdim=True)
+            assert waveform.shape[0] == 1, f"{filename}.wav has {waveform.shape[0]} channels."
 
             # 리샘플링
             waveform, _ = resample_waveform(waveform, orig_sr, self.target_sr)
@@ -103,10 +111,19 @@ class CycleDataset(Dataset):
                     cycle_wave = waveform[:, start_sample:end_sample]
 
                     # 호흡 사이클 길이 고정
-                    normed_wave = preprocess_waveform_segment(cycle_wave, unit_length=int(self.target_sec * self.target_sr))
+                    normed_wave = preprocess_waveform_segment(
+                        waveform=cycle_wave,
+                        unit_length=int(self.target_sec * self.target_sr)
+                    )
 
                     # Mel Spectrogram으로 변환
-                    mel = generate_mel_spectrogram(normed_wave, sample_rate=self.target_sr, frame_size=self.frame_size, hop_length=self.hop_length, n_mels=self.n_mels)
+                    mel = generate_mel_spectrogram(
+                        waveform=normed_wave,
+                        sample_rate=self.target_sr,
+                        frame_size=self.frame_size,
+                        hop_length=self.hop_length,
+                        n_mels=self.n_mels
+                    )
                     
                     # 캐시에 저장
                     if self.save_cache:

@@ -3,8 +3,8 @@ import torch.nn as nn
 import torch.optim as optim
 from torch.utils.data import DataLoader
 from tqdm import tqdm
-from typing import Dict, Tuple, Optional, Union
-from sklearn.metrics import f1_score
+from typing import Dict, Tuple, Optional, Any, Union
+from sklearn.metrics import confusion_matrix, f1_score
 
 from models.classifier import LungSoundClassifier
 from utils.logger import WandbLogger
@@ -13,10 +13,12 @@ class TestRunner:
     def __init__(
         self,
         model: LungSoundClassifier,
+        device: torch.device,
         test_loader: DataLoader
     ):
         self.model = model
-        self.train_loader = train_loader
+        self.device = device
+        self.test_loader = test_loader
 
     @torch.no_grad
     def test(self):
@@ -28,20 +30,27 @@ class TestRunner:
             all_labels: 정답 multi_label (numpy array)
             all_preds: 예측 multi_label (numpy array)
         """
+        # 평가 모드 전환 (Dropout, BatchNorm 스킵)
         self.model.eval()
 
         all_preds = []
         all_labels = []
 
+        progress_bar = tqdm(self.test_loader)
         with torch.no_grad():
-            for inputs, labels, _ in self.test_loader:
-                inputs, labels = inputs.to(self.device), labels.to(self.device)
+            for mel, multi_label, _ in progress_bar:
+                mel, multi_label = mel.to(self.device), multi_label.to(self.device)
 
-                outputs = self.model(inputs)
-                predicted = (torch.sigmoid(outputs) > 0.5).float()
+                outputs = self.model(mel)
+                preds = (torch.sigmoid(outputs) > 0.5).float()
 
-                all_preds.extend(preds.cpu().numpy())
-                all_labels.extend(multi_label.cpu().numpy())
+                all_preds.append(preds.cpu())
+                all_labels.append(multi_label.cpu())
+        
+        all_preds = torch.cat(all_preds, dim=0).numpy()
+        all_labels = torch.cat(all_labels, dim=0).numpy()
+
+        print(f"[DEBUG] 10 Predictions: {all_preds[0:10]}")
 
         # 개별 label별 성능 계산
         results = {}

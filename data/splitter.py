@@ -46,13 +46,14 @@ def get_shuffled_filenames(metadata_path: Union[str, Path], option: Literal["pre
     # filename list
     filename_list = splitted_df['filename'].tolist()
 
+    print(f"[INFO] {option} dataset has {len(filename_list)} audio files & ", end="")
     return filename_list
 
-def split_cycledataset(dataset: Dataset, filename_list: List[str], seed: int = 42) -> Subset:
+def split_cycledataset(train_dataset: Dataset, filename_list: List[str], seed: int = 42) -> Subset:
     """CycleDataset을 pretrain용 또는 finetuning용으로 분할
     
     Args:
-        dataset: CycleDataset
+        train_dataset: CycleDataset
         filename_list: 파일명 리스트
     
     Returns:
@@ -61,14 +62,18 @@ def split_cycledataset(dataset: Dataset, filename_list: List[str], seed: int = 4
     random.seed(seed)
     np.random.seed(seed)
 
-    file_idx = []
-    for i in range(len(dataset)):
-        filename = dataset[i][2]['filename']
-        file_idx.append(i)
-    
-    random.shuffle(file_idx)
-    shuffled_cycle_subset = Subset(dataset, file_idx)
+    cycle_idx = []
+    for i in range(len(train_dataset)):
+        filename = train_dataset[i][2]['filename']
 
+        # filename_list에 있는 .wav 파일의 cycle들만 추가
+        if filename in filename_list:
+            cycle_idx.append(i)
+    
+    random.shuffle(cycle_idx)
+    shuffled_cycle_subset = Subset(train_dataset, cycle_idx)
+
+    print(f"{len(shuffled_cycle_subset)} cycles.")
     return shuffled_cycle_subset
 
 def create_dataloaders(pretext_dataset: Dataset, 

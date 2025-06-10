@@ -24,10 +24,14 @@ def parse_args():
 
 def main():
     args = parse_args()
+
+    # 현재 프로젝트 루트 디렉토리 설정
+    project_root = Path(__file__).parent.parent
     
     # 실험 설정 로드
     exp_module = import_module(f'scripts.experiments.{args.exp}')
     exp_cfg = exp_module.ExperimentConfig(str(args.exp))
+    ssl_cfg = exp_cfg.ssl
     fnt_cfg = exp_cfg.finetune
     
     # 디렉토리 생성
@@ -36,9 +40,10 @@ def main():
     
     # wandb 초기화
     logger = WandbLogger(
-        project_name=f"{exp_cfg.wandb_project}-test",
-        entity=exp_cfg.wandb_entity,
-        config=vars(ftn_cfg)
+        project_name=exp_cfg.wandb_project,
+        experiment_name=exp_cfg.step3_experiment_name,
+        config=vars(fnt_cfg),
+        entity=exp_cfg.wandb_entity
     )
     
     # 디바이스 설정
@@ -53,21 +58,21 @@ def main():
         data_path=str(data_path),
         metadata_path=str(metadata_path),
         option="test",
-        target_sr=ftn_cfg.target_sr,
-        target_sec=ftn_cfg.target_sec,
-        frame_size=ftn_cfg.frame_size,
-        hop_length=ftn_cfg.hop_length,
-        n_mels=ftn_cfg.n_mels,
-        use_cache=False,    # 추후 True로 바꾸기
-        save_cache=True
+        target_sr=fnt_cfg.target_sr,
+        target_sec=fnt_cfg.target_sec,
+        frame_size=fnt_cfg.frame_size,
+        hop_length=fnt_cfg.hop_length,
+        n_mels=fnt_cfg.n_mels,
+        use_cache=exp_cfg.use_cache,
+        save_cache=exp_cfg.save_cache
     )
     
     # DataLoader 생성
     test_loader = torch.utils.data.DataLoader(
         test_dataset,
-        batch_size=ftn_cfg.batch_size,
+        batch_size=fnt_cfg.batch_size,
         shuffle=False,      # 추후 개선할 부분, 이미 dataset이 한번 셔플된 상태
-        num_workers=0 if device.type == 'cpu' else ftn_cfg.num_workers,
+        num_workers=0 if device.type == 'cpu' else fnt_cfg.num_workers,
         pin_memory=torch.cuda.is_available(),
         drop_last=True      # 추후 개선할 부분
     )
@@ -75,16 +80,15 @@ def main():
     # 모델 생성 (분류기까지 훈련된 것의 경로를 가져옴)
     model = create_classifier(
         checkpoint_path=args.ssl_checkpoint,
-        classifier=ftn_cfg.classifier,
-        freeze_backbone=ftn_cfg.freeze_backbone
+        backbone_config=ssl_cfg,
+        classifier=fnt_cfg.classifier,
+        freeze_encoder=fnt_cfg.freeze_encoder
     ).to(device)
-    
-    # 평가 모드 전환
-    model.eval()
 
-    # Trainer 생성
+    # Trainer 생성 (내부에서 평가모드로 전환함)
     tester = TestRunner(
         model=model,
+        device=device,
         test_loader=test_loader
     )
     
@@ -98,7 +102,7 @@ def main():
     conf_matrix, sens, spec = get_confusion_matrix_for_multi_class(all_labels, all_preds)
 
     # 2x2 Confusion matrix wandb 이미지 로그
-    log_confusion_matrix_for_multi_class(conf_matrix, sens, spec, logger):
+    log_confusion_matrix_for_multi_class(conf_matrix, sens, spec, logger)
     
     # wandb 종료
     logger.finish()
