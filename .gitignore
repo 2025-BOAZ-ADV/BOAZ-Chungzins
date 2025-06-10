@@ -1,3 +1,4 @@
+*.wav
 *.pth
 *.pyc
 __pycache__/
