@@ -56,7 +56,11 @@ class PretrainTrainer:
         progress_bar = tqdm(self.train_loader, desc=f'Epoch {epoch}')
         for batch_idx, (mel, _, _) in enumerate(progress_bar):
             # Augmentation 생성 인스턴스 정의
-            augmenter = create_augmenter(self.config, self.augmentations)
+            augmenter = create_augmenter(
+                self.config.target_sr,
+                self.config.target_sec,
+                self.augmentations
+            )
 
             # 두 개의 augmentation 적용
             aug1, aug2 = augmenter.generate_views(mel)[0], augmenter.generate_views(mel)[1]
