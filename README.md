@@ -21,10 +21,10 @@ ADV/
 │   ├── classifier.py      # 분류기
 │   └── moco.py            # MoCo 관련 모델
 ├── scripts/        
-│   ├── experiments/       # 실험 세팅값 모음
-│   ├───── exp001.py       # 현재 사용하는 실험 세팅
-│   ├───── exp002.py
-│   ├───── exp003.py
+│   └── experiments/       # 실험 세팅값 모음
+│       ├── exp001.py       # 현재 사용하는 실험 세팅
+│       ├── exp002.py
+│       └── exp003.py
 │   ├── run_eda.py         # EDA 실행 스크립트
 │   ├── run_finetune.py    # 파인튜닝 스크립트
 │   ├── run_pretrain.py    # 사전훈련 스크립트
