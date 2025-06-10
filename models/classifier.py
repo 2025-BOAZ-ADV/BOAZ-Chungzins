@@ -28,7 +28,7 @@ class LungSoundClassifier(nn.Module):
     def forward(self, x):
         # 백본에서 feature 추출
         features = self.backbone(x)
-        # 분류
+        # (Crackle, Wheeze) 분류
         return self.classifier(features)
 
 def create_classifier(checkpoint_path=None, classifier=None, freeze_backbone=True):
@@ -44,11 +44,11 @@ def create_classifier(checkpoint_path=None, classifier=None, freeze_backbone=Tru
     """
     backbone = create_backbone()
     
-    # MoCo의 encoder_q에서 가중치 로드
+    # MoCo 가중치 로드
     checkpoint = torch.load(checkpoint_path)
     backbone.load_state_dict(checkpoint['model_state_dict'], strict=False)
 
-    # encoder_q의 가중치 동결
+    # MoCo에서 encoder_q만 가져와 backbone으로 사용
     backbone = backbone.encoder_q.eval()
     
     return LungSoundClassifier(backbone, classifier, freeze_backbone)
