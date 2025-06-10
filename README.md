@@ -4,34 +4,35 @@
 
 ```
 ADV/
-├── checkpoints/           # 가중치 저장 경로
+├── checkpoints/           # 가중치 저장 경로  (git에 업로드 X)
 ├── config/                # 설정 파일 및 환경설정
 ├── data/
-│   ├── raw/               # 원본 데이터 (git에 업로드 X)
+│   ├── raw/               # 원본 데이터 
 │   ├── processed/         # 전처리된 데이터 (git에 업로드 X)
-│   ├── backup/            # 데이터 백업 (git에 업로드 X)
-│   ├── metadata/          # 데이터 관련 메타정보 (git에 업로드 X)
+│   ├── metadata/          # 데이터 관련 메타정보 
 │   ├── augmentation.py    # 데이터 증강 함수
 │   ├── cache.py           # 데이터 캐싱 관련 코드
 │   ├── dataset.py         # 데이터셋 클래스
 │   ├── preprocessor.py    # 데이터 전처리 함수
 │   └── splitter.py        # 데이터 분할 함수
-├── eda_results/           # EDA 결과 (git에 업로드 X)
-├── experiments/           # 실험 결과 (git에 업로드 X)
+├── eda_results/           # EDA 결과
 ├── models/                
 │   ├── backbone.py        # 백본 모델
 │   ├── classifier.py      # 분류기
 │   └── moco.py            # MoCo 관련 모델
-├── scripts/               
+├── scripts/        
+│   ├── experiments/       # 실험 세팅값 모음
+│   ├───── exp001.py       # 현재 사용하는 실험 세팅
+│   ├───── exp002.py
+│   ├───── exp003.py
 │   ├── run_eda.py         # EDA 실행 스크립트
 │   ├── run_finetune.py    # 파인튜닝 스크립트
 │   ├── run_pretrain.py    # 사전훈련 스크립트
 │   ├── run_test.py        # 테스트 스크립트
-│   └── experiments/       # 실험별 실행 스크립트
 ├── trainers/              
 │   ├── finetune.py        # 파인튜닝 모듈
 │   ├── pretrain.py        # 사전훈련 모듈
-│   ├── test.py            # 테스트 모듈
+│   └── test.py            # 테스트 모듈
 ├── utils/                 
 │   ├── eda.py             # EDA 관련 함수
 │   ├── logger.py          # 로깅 함수
@@ -45,13 +46,14 @@ ADV/
 
 ## 주요 코드 설명
 
-- **config/** : 하이퍼파라미터, 경로 등 설정 파일
+- **config/**, **experiments/** : 하이퍼파라미터, 경로 등 설정 파일
 - **data/** : 데이터 로딩, 전처리, 증강, 분할 등 데이터 관련 코드
 - **models/** : 모델 구조 정의 (백본, 분류기, MoCo 등)
 - **trainers/** : 사전훈련, 파인튜닝, 테스트 관련 코드
 - **utils/** : EDA, 로깅, 평가 지표 등 보조 함수
 - **scripts/** : EDA, 사전훈련, 파인튜닝, 테스트 스크립트
-- **experiments/**, **eda_results/**, **wandb/**, **wandb_logs/** : 실험 결과 및 로그 (git에 업로드 X)
+- **eda_results/**: EDA 결과 로그
+- **checkpoints/**, **processed/**, **wandb/** : 실험 결과 로그 (git에 업로드 X)
 - **Multi_label_Moco_0607.ipynb** : 원본 Jupyter 노트북
 
 ## 실행 방법
@@ -76,8 +78,7 @@ pip install -r requirements.txt
 ```
 
 ### 2. 데이터 준비
-`data/raw/` 폴더에 필요한 오디오 데이터(.wav 파일)와 메타데이터를 넣으세요.  
-(현재 폴더에는 .wav 파일들이 모두 업로드되어 있습니다)  
+`data/raw/` 폴더에 필요한 오디오 데이터(.wav 파일)가 있는지, `data/metadata/` 폴더에 메타데이터가 있는지 확인합니다.
 
 ### 3. W&B 로그인  
 실험을 진행하기 전 미리 W&B에 로그인해줍니다.  
