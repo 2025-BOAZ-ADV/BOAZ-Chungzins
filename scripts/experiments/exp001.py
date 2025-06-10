@@ -7,7 +7,7 @@ from config.base_config import BaseConfig
 from utils.logger import get_timestamp
 
 # 사전훈련 파라미터 설정
-class SSLConfig(BaseConfig):
+class SSLConfig:
     def __init__(self):
         # 음성 전처리 파라미터 (FinetuneConfig와 똑같이 맞춰주세요.)
         self.target_sr = 4000
@@ -39,7 +39,7 @@ class SSLConfig(BaseConfig):
         # 훈련 파라미터
         self.batch_size = 128
         self.num_workers = 4
-        self.epochs = 300
+        self.epochs = 300   # default: 300
         self.learning_rate = 0.03
         self.weight_decay = 0.01
 
@@ -74,7 +74,7 @@ class FinetuneConfig:
         # 훈련 파라미터
         self.batch_size = 128
         self.num_workers = 4
-        self.epochs = 100
+        self.epochs = 100   # default: 100
         self.learning_rate = 0.03
         self.weight_decay = 0.01
 

@@ -3,7 +3,6 @@ import torchaudio.transforms as T
 import random
 import math
 from typing import List, Dict, Any, Optional, Union
-from config.config import Config
 
 class AugmentationBase:
     """증강 기법의 기본 클래스"""
@@ -137,11 +136,12 @@ class AugmentationComposer:
         """
         return [self.__call__(mel) for _ in range(num_views)]
 
-def create_augmenter(config: Union[Config, SSLConfig], augmentations: [List[Dict[str, Any]]]) -> AugmentationComposer:
+def create_augmenter(target_sr, target_sec, augmentations: [List[Dict[str, Any]]]) -> AugmentationComposer:
     """증강기 생성
     
     Args:
-        config: 실험 설정
+        target_sr: 샘플링 레이트
+        target_sec: 오디오 길이
         augmentations: 증강 설정 리스트, dictionary로 구성된 리스트 (없으면 기본값 사용)
         예시: [
                 {'type': 'SpecAugment', 'params': {'time_mask_param': 0.8}},
@@ -163,7 +163,7 @@ def create_augmenter(config: Union[Config, SSLConfig], augmentations: [List[Dict
             {
                 'type': 'RandomCrop',
                 'params': {
-                    'crop_size': int(config.target_sr * config.target_sec)
+                    'crop_size': int(target_sr * target_sec)
                 }
             },
             {

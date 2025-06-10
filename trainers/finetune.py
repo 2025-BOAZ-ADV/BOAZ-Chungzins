@@ -15,7 +15,7 @@ class FinetuneTrainer:
         self,
         model: LungSoundClassifier,
         device: torch.device,
-        config: Union[Config, FinetuneConfig],
+        config: Any,
         train_loader: DataLoader,
         val_loader: Optional[DataLoader] = None,
         logger: WandbLogger = None

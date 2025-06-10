@@ -16,7 +16,7 @@ class PretrainTrainer:
         augmentations: [List[Dict[str, Any]]],
         train_loader: DataLoader,
         device: torch.device,
-        config: Union[Config, SSLConfig],
+        config: Any,
         logger: WandbLogger = None,
     ):
         self.model = model
