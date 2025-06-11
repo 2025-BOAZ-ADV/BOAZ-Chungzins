@@ -120,12 +120,12 @@ def visualize_mel_spectrograms(dataset: Dataset, num_samples: int = 5, save_dir:
         if samples_per_class[label] >= num_samples:
             continue
             
-        fig, ax = plt.subplots(figsize=(10, 4))
-        im = ax.imshow(mel.numpy().squeeze(), aspect='auto', origin='lower')
+        fig, ax = plt.subplots(figsize=(8, 4))
+        im = ax.imshow(mel.squeeze(0).numpy(), aspect='auto', origin='lower', cmap='magma')
         ax.set_title(f"{label} - {meta['filename']}")
         ax.set_xlabel('Time Frame')
         ax.set_ylabel('Mel Frequency Bin')
-        plt.colorbar(im, ax=ax)
+        plt.colorbar(im, ax=ax, format='%+2.0f dB')
         
         # Save figure
         plt.savefig(str(save_dir / f"{label}_{samples_per_class[label]}.png"))
