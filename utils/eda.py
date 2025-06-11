@@ -8,7 +8,7 @@ from collections import Counter
 from pathlib import Path
 
 def analyze_patient_distribution(df: pd.DataFrame) -> Tuple[pd.DataFrame, plt.Figure]:
-    """환자별 호흡 사이클 분포 분석
+    """환자별 호흡 사이클 상위 10명 분포 시각화
     
     Args:
         df: 파일명이 있는 DataFrame
@@ -21,7 +21,7 @@ def analyze_patient_distribution(df: pd.DataFrame) -> Tuple[pd.DataFrame, plt.Fi
     df['patient_id'] = df['filename'].apply(lambda x: x.split('_')[0])
     
     # 환자별 카운트
-    patient_counts = df['patient_id'].value_counts()
+    patient_counts = df['patient_id'].value_counts()[:10]
     
     # 통계 계산
     patient_stats = pd.DataFrame({
@@ -40,7 +40,7 @@ def analyze_patient_distribution(df: pd.DataFrame) -> Tuple[pd.DataFrame, plt.Fi
     return patient_stats, fig
 
 def analyze_cycle_duration(dataset: Dataset) -> Tuple[Dict, plt.Figure]:
-    """호흡 사이클 길이 분석
+    """호흡 사이클 길이 분포 시각화
     
     Args:
         dataset: CycleDataset
@@ -48,8 +48,9 @@ def analyze_cycle_duration(dataset: Dataset) -> Tuple[Dict, plt.Figure]:
     Returns:
         duration_stats: 길이 관련 통계
         fig: 분포 시각화
-    """    # 길이 추출
-    durations = [meta['duration'] for _, meta in dataset]
+    """    
+    # 길이 추출
+    durations = [meta['duration'] for _, _, meta in dataset]
     
     # 통계 계산
     duration_stats = {
@@ -82,8 +83,8 @@ def analyze_class_distribution(dataset: Dataset) -> Tuple[Dict[str, int], plt.Fi
     labels = []
     class_names = ['Normal', 'Crackle', 'Wheeze', 'Both']
 
-    for _, meta in dataset:
-        label_idx = meta['label']
+    for _, multi_label, _ in dataset:
+        label_idx = int(multi_label[0]*1 + multi_label[1]*2)
         labels.append(class_names[label_idx])
 
     class_counts = Counter(labels)
@@ -112,8 +113,9 @@ def visualize_mel_spectrograms(dataset: Dataset, num_samples: int = 5, save_dir:
     samples_per_class = {name: 0 for name in class_names}
     
     for idx in range(len(dataset)):
-        mel, meta = dataset[idx]
-        label = class_names[meta['label']]
+        mel, multi_label, meta = dataset[idx]
+        label_idx = int(multi_label[0]*1 + multi_label[1]*2)
+        label = class_names[label_idx]
         
         if samples_per_class[label] >= num_samples:
             continue

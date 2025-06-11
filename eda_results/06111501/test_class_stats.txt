@@ -1,0 +1,5 @@
+class_distribution:
+  Normal: 1579
+  Wheeze: 385
+  Crackle: 649
+  Both: 143

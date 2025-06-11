@@ -96,8 +96,8 @@ def get_confusion_matrix_for_multi_class(all_labels, all_preds):
     """다중 레이블 -> 다중 클래스로 변환하여 혼동 행렬 계산
     
     Args:
-        outputs: 모델 출력
-        labels: 실제 레이블
+        all_labels: 실제 레이블
+        all_preds: 모델 출력
     
     Returns:
         클래스별 메트릭 딕셔너리
