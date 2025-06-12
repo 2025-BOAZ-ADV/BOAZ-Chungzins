@@ -77,9 +77,9 @@ def split_cycledataset(train_dataset: Dataset, filename_list: List[str], seed: i
     return shuffled_cycle_subset
 
 def create_dataloaders(pretext_dataset: Dataset, 
-                      finetune_dataset: Dataset,
-                      batch_size: int,
-                      num_workers: int) -> Dict[str, DataLoader]:
+                        finetune_dataset: Dataset,
+                        batch_size: int,
+                        num_workers: int) -> Dict[str, DataLoader]:
     """데이터로더 생성
     
     Args:
@@ -113,42 +113,7 @@ def create_dataloaders(pretext_dataset: Dataset,
     return dataloaders
 
 
-##### 아래 함수들은 사용 여부 불확실
-def split_by_patient(df: pd.DataFrame, test_size: float = 0.2, seed: int = 42) -> Tuple[List[str], List[str]]:
-    """환자 ID 기준으로 데이터 분할
-    
-    Args:
-        df: 파일명과 환자 ID가 있는 DataFrame
-        test_size: 테스트 세트 비율
-        seed: 랜덤 시드
-    
-    Returns:
-        train_files, test_files: 분할된 파일명 리스트
-    """
-    random.seed(seed)
-    
-    # 환자 번호 추출
-    patient_numbers = []
-    for filename in df['filename']:
-        number = int(filename.split('_')[0])
-        patient_numbers.append(number)
-    
-    # 환자별 파일 수 계산
-    patient_counts = pd.Series(patient_numbers).value_counts()
-    all_patient_ids = list(patient_counts.index)
-    
-    # 환자 ID로 분할
-    random.shuffle(all_patient_ids)
-    split_idx = int(len(all_patient_ids) * (1 - test_size))
-    train_patients = all_patient_ids[:split_idx]
-    test_patients = all_patient_ids[split_idx:]
-    
-    # 파일명 리스트 생성
-    train_files = df[df['filename'].apply(lambda x: int(x.split('_')[0]) in train_patients)]['filename'].tolist()
-    test_files = df[df['filename'].apply(lambda x: int(x.split('_')[0]) in test_patients)]['filename'].tolist()
-    
-    return train_files, test_files
-
+### 아래 함수는 현재 사용하지 않음
 def get_class_weights(dataset: Dataset) -> torch.Tensor:
     """클래스별 가중치 계산
     

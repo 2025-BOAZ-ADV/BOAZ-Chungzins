@@ -2,7 +2,7 @@ import torch
 import torchaudio.transforms as T
 import random
 import math
-from typing import List, Dict, Any, Optional, Union
+from typing import List, Dict, Any, Union
 
 class AugmentationBase:
     """증강 기법의 기본 클래스"""
@@ -116,7 +116,7 @@ class AugmentationComposer:
         """증강 적용"""
         # 이미 정의된 증강들 중에서 랜덤하게 선택하여 적용
         aug_indices = random.sample(range(len(self.augmentations)), 
-                                  k=random.randint(1, len(self.augmentations)))
+                                    k=random.randint(1, len(self.augmentations)))
         
         mel_aug = mel.clone()
         for idx in aug_indices:
@@ -136,7 +136,9 @@ class AugmentationComposer:
         """
         return [self.__call__(mel) for _ in range(num_views)]
 
-def create_augmenter(target_sr, target_sec, augmentations: [List[Dict[str, Any]]]) -> AugmentationComposer:
+def create_augmenter(target_sr: int, 
+                    target_sec: Union[int, float],
+                    augmentations: List[Dict[str, Any]]) -> AugmentationComposer:
     """증강기 생성
     
     Args:
@@ -198,15 +200,3 @@ def apply_spec_augment(mel_segment: torch.Tensor):
     aug2 = freq_masking(time_masking(mel_segment.clone()))
 
     return aug1, aug2
-
-
-### 사용하지 않는 함수
-def repeat_or_truncate_segment(mel_segment: torch.Tensor, target_frames: int) -> torch.Tensor:
-    """Mel spectrogram 세그먼트를 target_frames에 맞게 조정"""
-    current_frames = mel_segment.shape[-1]
-    if current_frames >= target_frames:
-        return mel_segment[:, :, :target_frames]
-    else:
-        repeat_ratio = math.ceil(target_frames / current_frames)
-        mel_segment = mel_segment.repeat(1, 1, repeat_ratio)
-        return mel_segment[:, :, :target_frames]
