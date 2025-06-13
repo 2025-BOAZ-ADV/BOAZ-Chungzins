@@ -56,10 +56,10 @@ ADV/
 - **models/** : 모델 구조 정의 (백본, 분류기, MoCo 등)
 - **trainers/** : 사전훈련, 파인튜닝, 테스트 관련 코드
 - **utils/** : EDA, 로깅, 평가 지표 등 보조 함수
-- **scripts/** : EDA, 사전훈련, 파인튜닝, 테스트 스크립트
-- **eda_results/**: EDA 결과 로그
+- **scripts/** : 사전훈련, 파인튜닝, 테스트, 시각화 실험 스크립트
+- **pictures/eda_results/**, **pictures/tsne_results/**: EDA 결과 로그
 - **checkpoints/**, **processed/**, **wandb/** : 실험 결과 로그 (git에 업로드 X)
-- **Multi_label_Moco_0607.ipynb** : 원본 Jupyter 노트북
+- **backup.ipynb** : 원본 Jupyter 노트북
 
 ## 실행 방법
 
@@ -116,12 +116,12 @@ PYTHONPATH=. python scripts/run_test.py --exp exp001 --ssl-checkpoint checkpoint
 
 아래와 같은 구문을 bash에 입력하여 데이터 시각화를 수행합니다.  
 
-**EDA(Exploratory Data Analysis) 실행**
+**1) EDA(Exploratory Data Analysis) 실행**
 ```bash
 PYTHONPATH=. python scripts/run_eda.py
 ```
 
-**t-SNE 실험 수행**  
+**2) t-SNE 실험 수행**  
 - 필수 인자: `--exp`: 실험 세팅값  
 - `--ssl-checkpoint`: 사전훈련 인코더+분류기 가중치 경로  
 - `--projection`: projector에 통과하여 feature 벡터를 얻을지 여부 (y/n)  
