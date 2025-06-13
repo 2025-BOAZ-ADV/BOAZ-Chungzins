@@ -17,12 +17,6 @@ from utils.eda import (
 )
 from utils.logger import get_timestamp
 
-def parse_args():
-    parser = argparse.ArgumentParser(description='Exploratory Data Analysis')
-    parser.add_argument('--out-dir', type=str, default='eda_results',
-                        help='결과 저장 디렉토리')
-    return parser.parse_args()
-
 def save_statistics(stats: dict, filepath: str):
     """통계 결과를 텍스트 파일로 저장"""
     with open(filepath, 'w', encoding='utf-8') as f:
@@ -34,14 +28,12 @@ def save_statistics(stats: dict, filepath: str):
             else:
                 f.write(f"{key}: {value}\n")
 
-def main():
-    args = parse_args()
-    
+def main():    
     # 현재 프로젝트 루트 디렉토리 설정
     project_root = Path(__file__).parent.parent
 
     # 결과 저장 디렉토리 생성
-    out_dir = Path(args.out_dir) / str(get_timestamp())
+    out_dir = project_root / 'eda_results' / str(get_timestamp())
     out_dir.mkdir(parents=True, exist_ok=True)
     
     # 데이터셋 경로 설정

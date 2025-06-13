@@ -35,10 +35,6 @@ def main():
     ssl_cfg = exp_cfg.ssl
     fnt_cfg = exp_cfg.finetune
     
-    # 디렉토리 생성
-    out_dir = Path(exp_cfg.checkpoint_dir)
-    out_dir.mkdir(parents=True, exist_ok=True)
-    
     # wandb 초기화
     logger = WandbLogger(
         project_name=exp_cfg.wandb_project,
