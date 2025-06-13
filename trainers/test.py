@@ -26,8 +26,8 @@ class TestRunner:
         Returns:
             avg_results: 각 metric의 평균
             results: 각 클래스별 metric dict
-            all_labels: 정답 multi_label (numpy array)
-            all_preds: 예측 multi_label (numpy array)
+            all_labels: 정답 multi_label (numpy.ndarray)
+            all_preds: 예측 multi_label (numpy.ndarray)
         """
         # 평가 모드 전환 (Dropout, BatchNorm 스킵)
         self.model.eval()
@@ -41,21 +41,31 @@ class TestRunner:
                 mel, multi_label = mel.to(self.device), multi_label.to(self.device)
 
                 outputs = self.model(mel)
-                preds = (torch.sigmoid(outputs) > 0.5).float()
+                preds = (torch.sigmoid(outputs) > 0.5).float()     # tensor([[0.,0.],[1.,0.],[0.,1.],[1.,0.]])
 
                 all_preds.append(preds.cpu())
                 all_labels.append(multi_label.cpu())
         
-        all_preds = torch.cat(all_preds, dim=0).numpy()
-        all_labels = torch.cat(all_labels, dim=0).numpy()
+        # 예측 라벨, 실제 라벨들을 병합
+        all_preds = torch.cat(all_preds, dim=0).numpy()    
+        all_labels = torch.cat(all_labels, dim=0).numpy()  
 
-        print(f"[DEBUG] 10 Predictions: {all_preds[0:10]}")
+        '''all_preds 또는 all_labels의 출력 예:
+
+        [[0. 0.]  ← 1번째 샘플 (Normal)
+        [1. 0.]   ← 2번째 샘플 (Crackle)
+        ...
+        [0. 1.]   ← (N-1)번째 샘플 (Wheeze)
+        [1. 1.]]  ← N번째 샘플 (Both)
+
+        자료형: numpy.ndarray, 즉 Nx2 행렬
+        '''
 
         # 개별 label별 성능 계산
         results = {}
         for i, lbl_name in enumerate(['Crackle', 'Wheeze']):
-            y_true = all_labels[:, i]
-            y_pred = all_preds[:, i]
+            y_true = all_labels[:, i]   # 정답 라벨 리스트 반환 (1 or 0으로 구성)
+            y_pred = all_preds[:, i]    # 예측 라벨 리스트 반환 (1 or 0으로 구성)
 
             cm = confusion_matrix(y_true, y_pred)
             TN, FP, FN, TP = cm.ravel()

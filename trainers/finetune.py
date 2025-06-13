@@ -77,11 +77,13 @@ class FinetuneTrainer:
             # loss 합산 및 정답/예측 label 저장
             total_loss += loss.item()
             preds = (torch.sigmoid(outputs) > 0.5).float()
-            all_preds.extend(preds.cpu().numpy())
-            all_labels.extend(multi_label.cpu().numpy())
+            all_preds.extend(preds.cpu().tolist())
+            all_labels.extend(multi_label.cpu().tolist())
             
             # progress bar 업데이트
             progress_bar.set_postfix({'Loss': loss.item()})
+
+        print(all_preds)
         
         epoch_loss = total_loss / len(self.train_loader)
         epoch_f1 = f1_score(all_labels, all_preds, average='macro')
@@ -114,8 +116,8 @@ class FinetuneTrainer:
             
             total_loss += loss.item()
             preds = (torch.sigmoid(outputs) > 0.5).float()
-            all_preds.extend(preds.cpu().numpy())
-            all_labels.extend(multi_label.cpu().numpy())
+            all_preds.extend(preds.cpu().tolist())
+            all_labels.extend(multi_label.cpu().tolist())
         
         val_loss = total_loss / len(self.val_loader)
         val_f1 = f1_score(all_labels, all_preds, average='macro')

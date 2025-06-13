@@ -79,12 +79,18 @@ def log_confusion_matrix_for_multi_label(confusion_matrices, logger=None):
 
         plt.close(fig)
 
-def convert_to_multi_class(labels):
-    """다중 레이블 -> 다중 클래스 변환
-    [0,0] -> 0 (Normal)
-    [1,0] -> 1 (Crackle)
-    [0,1] -> 2 (Wheeze)
-    [1,1] -> 3 (Both)
+def convert_matrix_to_list(labels):
+    """Nx2 행렬을 -> 다중 클래스 list로 변환
+
+    (Before)
+    [[0. 0.]  ← 1번째 샘플 (Normal)
+    [1. 0.]   ← 2번째 샘플 (Crackle)
+    ...
+    [0. 1.]   ← (N-1)번째 샘플 (Wheeze)
+    [1. 1.]]  ← N번째 샘플 (Both)
+
+    (After)
+    [0, 1, ..., 2, 3]
     """
     
     labels = labels.cpu().numpy() if torch.is_tensor(labels) else labels
@@ -101,8 +107,8 @@ def get_confusion_matrix_for_multi_class(all_labels, all_preds):
         클래스별 메트릭 딕셔너리
     """
     
-    all_labels_cls = convert_to_multi_class(all_labels)
-    all_preds_cls = convert_to_multi_class(all_preds)
+    all_labels_cls = convert_matrix_to_list(all_labels)
+    all_preds_cls = convert_matrix_to_list(all_preds)
 
     # 4x4 matrix
     conf_matrix = confusion_matrix(all_labels_cls, all_preds_cls, labels=[0,1,2,3])
@@ -157,4 +163,4 @@ def log_confusion_matrix_for_multi_class(normalized_conf_matrix, sens, spec, log
             "Metrics/[4Class] ICHBI Score": (sens+spec)/2
         })
 
-    plt.close(fig)
+    plt.show()

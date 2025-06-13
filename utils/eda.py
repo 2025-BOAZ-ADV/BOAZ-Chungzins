@@ -6,6 +6,7 @@ from typing import List, Dict, Tuple, Any
 from torch.utils.data import Dataset
 from collections import Counter
 from pathlib import Path
+from sklearn.manifold import TSNE
 
 def analyze_patient_distribution(df: pd.DataFrame) -> Tuple[pd.DataFrame, plt.Figure]:
     """환자별 호흡 사이클 상위 10명 분포 시각화

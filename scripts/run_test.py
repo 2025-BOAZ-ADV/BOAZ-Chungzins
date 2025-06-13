@@ -13,6 +13,7 @@ from trainers.test import TestRunner
 from utils.logger import WandbLogger
 from utils.metrics import get_confusion_matrix_for_multi_label, log_confusion_matrix_for_multi_label
 from utils.metrics import get_confusion_matrix_for_multi_class, log_confusion_matrix_for_multi_class
+from utils.tsne import extract_features, plot_tsne
 
 def parse_args():
     parser = argparse.ArgumentParser(description='STEP 3. Test')
@@ -101,6 +102,10 @@ def main():
     # 4x4 Confusion matrix wandb 이미지와 성능 로그
     conf_matrix, sens, spec = get_confusion_matrix_for_multi_class(all_labels, all_preds)
     log_confusion_matrix_for_multi_class(conf_matrix, sens, spec, logger)
+
+    # t-SNE 시각화
+    all_features, all_labels = extract_features(model.encoder, test_loader, device)
+    plot_tsne(all_features, all_labels, logger, sens=sens, spec=spec)
     
     # wandb 종료
     logger.finish()

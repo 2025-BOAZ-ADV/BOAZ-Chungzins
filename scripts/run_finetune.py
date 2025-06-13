@@ -12,6 +12,7 @@ from data.splitter import get_shuffled_filenames, split_cycledataset, create_dat
 from models.classifier import create_classifier
 from trainers.finetune import FinetuneTrainer
 from utils.logger import WandbLogger
+from utils.tsne import extract_features, plot_tsne
 
 def parse_args():
     parser = argparse.ArgumentParser(description='STEP 2. Fine-tuning')
@@ -152,6 +153,10 @@ def main():
         epochs=fnt_cfg.epochs - start_epoch,
         save_path=str(checkpoints_dir)
     )
+
+    # t-SNE 시각화
+    all_features, all_labels = extract_features(model.encoder, train_loader, device)
+    plot_tsne(all_features, all_labels, logger)
     
     # wandb 종료
     logger.finish()

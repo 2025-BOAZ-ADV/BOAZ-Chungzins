@@ -46,8 +46,8 @@ class SSLConfig:
         self.weight_decay = 0.01
 
         # 캐시 사용 여부 (캐시 = ICBHI train data의 각 cycle의 mel spectrogram을 다음에 불러오기 쉽게 .pt 파일로 백업해놓은 것)
-        self.use_cache = False  # 오디오를 mel spectrogram으로 변환하는 작업을 건너뛰고 캐시를 불러올지 설정
-        self.save_cache = True  # 캐시 저장 여부 (오디오 파일명을 해시로 변환한 것이므로, 새로 저장 시 덮어쓰기가 됨)
+        self.use_cache = True  # 오디오를 mel spectrogram으로 변환하는 작업을 건너뛰고 캐시를 불러올지 설정
+        self.save_cache = False  # 캐시 저장 여부 (오디오 파일명을 해시로 변환한 것이므로, 새로 저장 시 덮어쓰기가 됨)
 
 # 파인튜닝 파라미터 설정
 class FinetuneConfig:
@@ -85,8 +85,8 @@ class FinetuneConfig:
         self.weight_decay = 0.01
 
         # 캐시 사용 여부 (캐시 = ICBHI train data의 각 cycle의 mel spectrogram을 다음에 불러오기 쉽게 .pt 파일로 백업해놓은 것)
-        self.use_cache = False  # 오디오를 mel spectrogram으로 변환하는 작업을 건너뛰고 캐시를 불러올지 설정
-        self.save_cache = True  # 캐시 저장 여부 (오디오 파일명을 해시로 변환한 것이므로, 새로 저장 시 덮어쓰기가 됨)
+        self.use_cache = True  # 오디오를 mel spectrogram으로 변환하는 작업을 건너뛰고 캐시를 불러올지 설정
+        self.save_cache = False  # 캐시 저장 여부 (오디오 파일명을 해시로 변환한 것이므로, 새로 저장 시 덮어쓰기가 됨)
 
 # 실험 파라미터 설정
 class ExperimentConfig:
@@ -103,8 +103,8 @@ class ExperimentConfig:
         self.finetune = FinetuneConfig()
 
         # 성능 평가 시 캐시 사용 여부 (캐시 = ICHBI test data의 각 cycle의 mel spectrogram)
-        self.use_cache = False
-        self.save_cache = True
+        self.use_cache = True
+        self.save_cache = False
         
         # 사전훈련 실험 이름
         self.step1_experiment_name = (

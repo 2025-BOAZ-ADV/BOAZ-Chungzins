@@ -13,6 +13,7 @@ from models.backbone import create_backbone
 from models.moco import MoCo
 from trainers.pretrain import PretrainTrainer
 from utils.logger import get_timestamp, WandbLogger
+from utils.tsne import extract_features, plot_tsne
 
 def parse_args():
     parser = argparse.ArgumentParser(description='STEP 1. Pretraining')
@@ -122,7 +123,11 @@ def main():
         epochs=ssl_cfg.epochs - start_epoch,
         save_path=str(checkpoints_dir)
     )
-    
+
+    # t-SNE 시각화
+    all_features, all_labels = extract_features(model.encoder_q, pretrain_loader, device)
+    plot_tsne(all_features, all_labels, logger)
+
     # wandb 종료
     logger.finish()
 
