@@ -103,8 +103,8 @@ def main():
     conf_matrix, sens, spec = get_confusion_matrix_for_multi_class(all_labels, all_preds)
     log_confusion_matrix_for_multi_class(conf_matrix, sens, spec, logger)
 
-    # t-SNE 시각화
-    all_features, all_labels = extract_features(model.encoder, test_loader, device)
+    # t-SNE 시각화 (고차원 벡터에 t-SNE 적용하길 원할 경우 dim_mlp=None으로 설정)
+    all_features, all_labels = extract_features(model.encoder, test_loader, device, dim_mlp=ssl_cfg.dim_mlp)
     plot_tsne(all_features, all_labels, logger, sens=sens, spec=spec)
     
     # wandb 종료

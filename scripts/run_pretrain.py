@@ -124,8 +124,8 @@ def main():
         save_path=str(checkpoints_dir)
     )
 
-    # t-SNE 시각화
-    all_features, all_labels = extract_features(model.encoder_q, pretrain_loader, device)
+    # t-SNE 시각화 (고차원 벡터에 t-SNE 적용하길 원할 경우 dim_mlp=None으로 설정)
+    all_features, all_labels = extract_features(model.encoder_q, pretrain_loader, device, dim_mlp=ssl_cfg.dim_mlp)
     plot_tsne(all_features, all_labels, logger)
 
     # wandb 종료

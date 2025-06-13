@@ -104,9 +104,16 @@ PYTHONPATH=. python scripts/run_finetune.py --exp exp001 --ssl-checkpoint checkp
 PYTHONPATH=. python scripts/run_test.py --exp exp001 --ssl-checkpoint checkpoints/exp001/best_finetuned_model_(timestamp).pth
 ```
 
+아래와 같은 구문을 bash에 입력하여 시각화를 수행합니다.  
+
 **EDA(Exploratory Data Analysis) 실행**
 ```bash
 PYTHONPATH=. python scripts/run_eda.py
+```
+
+**t-SNE 실험 수행**  (필수 인자: `--exp`: 실험 세팅값, `--ssl-checkpoint`: 사전훈련 인코더+분류기 가중치 경로, `--projection`: projector에 통과하여 feature 벡터를 얻을지 여부 (y/n), `--data`: 사전훈련 데이터 또는 테스트 데이터 (pretrain/test))  
+```bash
+PYTHONPATH=. python scripts/run_TSNE.py --exp exp001 --ssl-checkpoint checkpoints/exp001/best_finetuned_model_(timestamp).pth --projection 'y' --data 'test'
 ```
 
 만약 실행 중단을 원할 경우, 터미널에서 Ctrl+C를 입력하여 강제 종료합니다.  

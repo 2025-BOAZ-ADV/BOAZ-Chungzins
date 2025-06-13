@@ -1,25 +1,44 @@
 import torch
+import torch.nn as nn
+import torch.nn.functional as F
 import matplotlib.pyplot as plt
 import seaborn as sns
 import wandb
 from typing import Optional
-from torch.utils.data import Dataset, DataLoader
 from tqdm import tqdm
 from sklearn.manifold import TSNE
 
-from utils.logger import get_timestamp, WandbLogger
+from utils.logger import WandbLogger
 
 # t-SNE를 위한 feature 추출 함수
 @torch.no_grad()
-def extract_features(encoder, dataloader, device):
+def extract_features(encoder, dataloader, device, dim_mlp: Optional[int] = None):
     all_features = []
     all_labels = []
 
-    for mel, multi_label, _ in tqdm(dataloader, desc="Extracting features..."):
+    if dim_mlp is not None:
+        # projection head 생성
+        dim_enc = 2048     # ResNet50의 출력 차원
+        dim_prj = dim_mlp  # projection head의 출력 차원
+        
+        proj_head = nn.Sequential(
+                nn.Linear(dim_enc, dim_enc),
+                nn.BatchNorm1d(dim_enc),
+                nn.GELU(),
+                nn.Linear(dim_enc, dim_prj)
+            )
+    
+    # feature 벡터 추출 (feature 벡터를 저차원으로 축소하고 싶으면 projector를 통과시킴)
+    for mel, multi_label, _ in tqdm(dataloader, desc="Extracting features for t-SNE"):
         mel = mel.to(device)
-        out = encoder(mel)
-        out = torch.nn.functional.normalize(out, dim=1)  # L2 정규화
-        all_features.append(out.cpu())
+        g1 = F.normalize(encoder(mel), dim=1)
+
+        if dim_mlp is not None:
+            z1 = F.normalize(proj_head(g1), dim=1)
+            all_features.append(z1.cpu())
+        else:
+            all_features.append(g1.cpu())
+
         all_labels.append(multi_label.cpu())
 
     all_features = torch.cat(all_features, dim=0).numpy()
@@ -33,15 +52,17 @@ def plot_tsne(
         all_labels,
         logger: WandbLogger,
         sens: Optional[float] = None,
-        spec: Optional[float] = None
+        spec: Optional[float] = None,
+        perplexity: int = 30,
+        max_iter: int = 300
     ): 
 
     # t-SNE 적용
-    tsne = TSNE(n_components=2, random_state=42, perplexity=30)
+    tsne = TSNE(n_components=2, random_state=42, perplexity=perplexity, max_iter=max_iter)
     reduced = tsne.fit_transform(all_features)
 
     # 선택한 라벨만 추출
-    for i, option in enumerate(['Crackle', 'Wheeze']):
+    for option in ['Crackle', 'Wheeze']:
         labels = all_labels[:, 0] if option == "Crackle" else all_labels[:, 1]
         label_names = ["Normal", option]
 
@@ -73,4 +94,4 @@ def plot_tsne(
 
         # logging
         if logger:
-            logger.log({f't-SNE Visualization of {option} ({get_timestamp()})': wandb.Image(fig)})
+            logger.log({f't-SNE Visualization of {option}': wandb.Image(fig)})

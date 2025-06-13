@@ -1,4 +1,4 @@
-"""데이터 탐색적 분석 스크립트"""
+"""EDA 스크립트"""
 
 import os
 import argparse
