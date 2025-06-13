@@ -36,8 +36,8 @@ def log_confusion_matrix_for_multi_label(confusion_matrices, logger=None):
         # 2x2 matrix
         conf_matrix = confusion_matrices[label_name]
 
-        # 혼동 행렬 정규화
-        normalized_conf_matrix = np.array(conf_matrix) / np.array(conf_matrix).sum()
+        # 혼동 행렬 행 기준 정규화 (실제 클래스별 예측 비율 분석)
+        normalized_conf_matrix = np.array(conf_matrix) / np.array(conf_matrix).sum(axis=1, keepdims=True)
 
         # 정규화된 혼동 행렬 로깅 (소숫점 둘째 자리에서 반올림)
         fig, ax = plt.subplots(figsize=(5, 4))
@@ -113,8 +113,8 @@ def get_confusion_matrix_for_multi_class(all_labels, all_preds):
     # 4x4 matrix
     conf_matrix = confusion_matrix(all_labels_cls, all_preds_cls, labels=[0,1,2,3])
 
-    # 혼동 행렬 정규화
-    normalized_conf_matrix = np.array(conf_matrix) / np.array(conf_matrix).sum()
+    # 혼동 행렬 행 기준 정규화 (실제 클래스별 예측 비율 분석)
+    normalized_conf_matrix = np.array(conf_matrix) / np.array(conf_matrix).sum(axis=1, keepdims=True)
 
     # Positive: 1,2,3 / Negative: 0
     TP = conf_matrix[1:, 1:].sum()    # 양성 중에 양성으로 예측
