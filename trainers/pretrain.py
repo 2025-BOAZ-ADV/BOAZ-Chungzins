@@ -7,7 +7,6 @@ from typing import List, Dict, Tuple, Any, Union
 from models.moco import MoCo
 from data.augmentation import create_augmenter, apply_spec_augment
 from utils.logger import get_timestamp, WandbLogger
-from config.config import Config
 
 class PretrainTrainer:
     def __init__(

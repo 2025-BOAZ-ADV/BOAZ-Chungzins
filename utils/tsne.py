@@ -4,11 +4,12 @@ import torch.nn.functional as F
 import matplotlib.pyplot as plt
 import seaborn as sns
 import wandb
-from typing import Optional
+from typing import Optional, Union
+from pathlib import Path
 from tqdm import tqdm
 from sklearn.manifold import TSNE
 
-from utils.logger import WandbLogger
+from utils.logger import get_timestamp, WandbLogger
 
 # t-SNE를 위한 feature 추출 함수
 @torch.no_grad()
@@ -54,7 +55,8 @@ def plot_tsne(
         sens: Optional[float] = None,
         spec: Optional[float] = None,
         perplexity: int = 30,
-        max_iter: int = 300
+        max_iter: int = 300,
+        save_dir: Union[str, Path] = 'tnse_results'
     ): 
 
     # t-SNE 적용
@@ -90,6 +92,7 @@ def plot_tsne(
             )
             
         plt.tight_layout()
+        plt.savefig(str(save_dir / f"{option}.png"))
         plt.show()
 
         # logging

@@ -5,7 +5,6 @@ import argparse
 from pathlib import Path
 import torch
 from importlib import import_module
-from sklearn.model_selection import train_test_split
 
 from data.dataset import CycleDataset
 from models.classifier import create_classifier
@@ -99,9 +98,12 @@ def main():
     conf_matrix, sens, spec = get_confusion_matrix_for_multi_class(all_labels, all_preds)
     log_confusion_matrix_for_multi_class(conf_matrix, sens, spec, logger)
 
-    # t-SNE 시각화 (고차원 벡터에 t-SNE 적용하길 원할 경우 dim_mlp=None으로 설정)
+    # t-SNE 결과 저장 폴더
+    out_dir = project_root / 'tsne_results'
+
+    # t-SNE 시각화
     all_features, all_labels = extract_features(model.encoder, test_loader, device, dim_mlp=ssl_cfg.dim_mlp)
-    plot_tsne(all_features, all_labels, logger, sens=sens, spec=spec)
+    plot_tsne(all_features, all_labels, logger, sens=sens, spec=spec, save_dir=out_dir)
     
     # wandb 종료
     logger.finish()

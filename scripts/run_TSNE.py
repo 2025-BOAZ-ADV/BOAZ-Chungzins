@@ -128,8 +128,22 @@ def main():
         dim_mlp = None
 
     # t-SNE 시각화
-    all_features, all_labels = extract_features(model.encoder, data_loader, device, dim_mlp=dim_mlp)
-    plot_tsne(all_features, all_labels, logger=logger, sens=None, spec=None, perplexity=args.perplexity, max_iter=args.max_iter)
+    all_features, all_labels = extract_features(
+        model.encoder,
+        data_loader,
+        device,
+        dim_mlp=dim_mlp
+    )
+    plot_tsne(
+        all_features,
+        all_labels,
+        logger=logger,
+        sens=None,
+        spec=None,
+        perplexity=args.perplexity,
+        max_iter=args.max_iter,
+        save_dir=out_dir
+    )
 
 if __name__ == "__main__":
     main()

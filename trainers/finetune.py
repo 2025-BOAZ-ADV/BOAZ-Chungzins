@@ -8,7 +8,6 @@ from sklearn.metrics import f1_score
 
 from models.classifier import LungSoundClassifier
 from utils.logger import get_timestamp, WandbLogger
-from config.config import Config
 
 class FinetuneTrainer:
     def __init__(
