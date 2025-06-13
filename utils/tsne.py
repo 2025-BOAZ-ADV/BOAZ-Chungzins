@@ -56,8 +56,11 @@ def plot_tsne(
         spec: Optional[float] = None,
         perplexity: int = 30,
         max_iter: int = 300,
-        save_dir: Union[str, Path] = 'tnse_results'
+        save_dir: Union[str, Path] = None
     ): 
+    # 결과 저장 디렉토리
+    save_dir = Path(save_dir)
+    save_dir.mkdir(parents=True, exist_ok=True)
 
     # t-SNE 적용
     tsne = TSNE(n_components=2, random_state=42, perplexity=perplexity, max_iter=max_iter)

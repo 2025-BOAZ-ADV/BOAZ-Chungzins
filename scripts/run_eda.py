@@ -33,7 +33,7 @@ def main():
     project_root = Path(__file__).parent.parent
 
     # 결과 저장 디렉토리 생성
-    out_dir = project_root / 'eda_results' / str(get_timestamp())
+    out_dir = project_root / 'pictures' / 'eda_results' / str(get_timestamp())
     out_dir.mkdir(parents=True, exist_ok=True)
     
     # 데이터셋 경로 설정

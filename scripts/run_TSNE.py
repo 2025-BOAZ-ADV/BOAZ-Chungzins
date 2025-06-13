@@ -29,8 +29,6 @@ def parse_args():
                         help='perplexity')
     parser.add_argument('--max-iter', type=int, default=300,
                         help='max_iter')
-    parser.add_argument('--out-dir', type=str, default='tnse_results',
-                        help='결과 저장 디렉토리')
     return parser.parse_args()
 
 def main():
@@ -46,8 +44,7 @@ def main():
     fnt_cfg = exp_cfg.finetune
 
     # 결과 저장 디렉토리 생성
-    out_dir = Path(args.out_dir) / str(get_timestamp())
-    out_dir.mkdir(parents=True, exist_ok=True)
+    out_dir = project_root / 'pictures' / 'tsne_results' / str(get_timestamp())
 
     # 데이터셋 경로 설정
     data_path = project_root / 'data' / 'raw'
@@ -144,6 +141,8 @@ def main():
         max_iter=args.max_iter,
         save_dir=out_dir
     )
+
+    print(f"t-SNE results saved to {out_dir}")
 
 if __name__ == "__main__":
     main()

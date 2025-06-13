@@ -9,7 +9,7 @@ from importlib import import_module
 from data.dataset import CycleDataset
 from models.classifier import create_classifier
 from trainers.test import TestRunner
-from utils.logger import WandbLogger
+from utils.logger import get_timestamp, WandbLogger
 from utils.metrics import get_confusion_matrix_for_multi_label, log_confusion_matrix_for_multi_label
 from utils.metrics import get_confusion_matrix_for_multi_class, log_confusion_matrix_for_multi_class
 from utils.tsne import extract_features, plot_tsne
@@ -45,6 +45,9 @@ def main():
     # 디바이스 설정
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
+    # t-SNE 결과 저장 폴더
+    out_dir = project_root / 'pictures' / 'tsne_results' / str(get_timestamp())
+    
     # 데이터셋 경로 설정
     data_path = project_root / 'data' / 'raw'
     metadata_path = project_root / 'data' / 'metadata'
@@ -97,9 +100,6 @@ def main():
     # 4x4 Confusion matrix wandb 이미지와 성능 로그
     conf_matrix, sens, spec = get_confusion_matrix_for_multi_class(all_labels, all_preds)
     log_confusion_matrix_for_multi_class(conf_matrix, sens, spec, logger)
-
-    # t-SNE 결과 저장 폴더
-    out_dir = project_root / 'tsne_results'
 
     # t-SNE 시각화
     all_features, all_labels = extract_features(model.encoder, test_loader, device, dim_mlp=ssl_cfg.dim_mlp)

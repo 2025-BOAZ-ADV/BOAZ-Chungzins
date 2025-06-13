@@ -2,7 +2,8 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
-from typing import List, Dict, Tuple, Any
+from pathlib import Path
+from typing import Dict, Tuple, Union
 from torch.utils.data import Dataset
 from collections import Counter
 from pathlib import Path
@@ -98,7 +99,7 @@ def analyze_class_distribution(dataset: Dataset) -> Tuple[Dict[str, int], plt.Fi
 
     return class_counts, fig
 
-def visualize_mel_spectrograms(dataset: Dataset, num_samples: int = 5, save_dir: str = 'spectrograms') -> None:
+def visualize_mel_spectrograms(dataset: Dataset, num_samples: int = 5, save_dir: Union[str,Path] = None) -> None:
     """멜 스펙트로그램 시각화
     
     Args:
@@ -106,8 +107,9 @@ def visualize_mel_spectrograms(dataset: Dataset, num_samples: int = 5, save_dir:
         num_samples: 시각화할 샘플 수
         save_dir: 이미지 저장 디렉토리
     """
+    # 결과 저장 디렉토리
     save_dir = Path(save_dir)
-    save_dir.mkdir(exist_ok=True)
+    save_dir.mkdir(parents=True, exist_ok=True)
     
     class_names = ['Normal', 'Crackle', 'Wheeze', 'Both']
     samples_per_class = {name: 0 for name in class_names}

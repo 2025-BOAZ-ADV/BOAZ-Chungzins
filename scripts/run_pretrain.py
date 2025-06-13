@@ -49,6 +49,9 @@ def main():
     # 디바이스 설정
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     
+    # t-SNE 결과 저장 폴더
+    out_dir = project_root / 'pictures' / 'tsne_results' / str(get_timestamp())
+    
     # 데이터셋 경로 설정
     data_path = project_root / 'data' / 'raw'
     metadata_path = project_root / 'data' / 'metadata'
