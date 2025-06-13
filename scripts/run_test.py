@@ -92,16 +92,14 @@ def main():
         test_loader=test_loader
     )
     
-    # 성능 계산
-    avg_results, all_labels, all_preds = tester.test()
+    # 성능 평가 수행
+    all_labels, all_preds = tester.test()
 
-    # 각 label의 2x2 Confusion matrix wandb 이미지와 평균 성능 로그
-    log_confusion_matrix_for_multi_label(get_confusion_matrix_for_multi_label(all_labels, all_preds), avg_results, logger)
+    # 각 label의 2x2 Confusion matrix wandb 이미지와 성능 로그
+    log_confusion_matrix_for_multi_label(get_confusion_matrix_for_multi_label(all_labels, all_preds), logger)
 
-    # multi-class로 변환하여 성능 출력
+    # 4x4 Confusion matrix wandb 이미지와 성능 로그
     conf_matrix, sens, spec = get_confusion_matrix_for_multi_class(all_labels, all_preds)
-
-    # 2x2 Confusion matrix wandb 이미지 로그
     log_confusion_matrix_for_multi_class(conf_matrix, sens, spec, logger)
     
     # wandb 종료

@@ -13,7 +13,7 @@ class PretrainTrainer:
     def __init__(
         self,
         model: MoCo,
-        augmentations: [List[Dict[str, Any]]],
+        augmentations: List[Dict[str, Any]],
         train_loader: DataLoader,
         device: torch.device,
         config: Any,

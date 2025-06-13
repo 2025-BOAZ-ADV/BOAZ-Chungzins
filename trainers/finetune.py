@@ -198,6 +198,7 @@ class FinetuneTrainer:
                         'best_val_f1': best_val_f1,
                     }, f'{save_path}/best_finetuned_model_{get_timestamp()}.pth')
             
+            # epoch 당 loss, f1 출력
             print(f'Epoch {epoch}:')
             print(f'Train - Loss: {train_loss:.4f}, F1: {train_f1:.4f}')
 

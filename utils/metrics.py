@@ -4,7 +4,6 @@ import wandb
 import seaborn as sns
 import matplotlib.pyplot as plt
 from sklearn.metrics import f1_score, precision_score, recall_score, confusion_matrix
-from typing import Dict, Tuple
 
 def get_confusion_matrix_for_multi_label(all_labels, all_preds):
     """각 label에 대한 혼동 행렬 계산
@@ -24,12 +23,11 @@ def get_confusion_matrix_for_multi_label(all_labels, all_preds):
     
     return confusion_matrices
 
-def log_confusion_matrix_for_multi_label(confusion_matrices, avg_results, logger=None):
+def log_confusion_matrix_for_multi_label(confusion_matrices, logger=None):
     """각 label에 대한 혼동 행렬을 로그
     
     Args:
         confusion_matrices: 각 단일 label의 혼동 행렬 (Dict)
-        avg_results: 각 label별 평균 성능 (Dict)
         logger: WandbLogger
     """
     label_names = ['Crackle', 'Wheeze']
@@ -69,17 +67,17 @@ def log_confusion_matrix_for_multi_label(confusion_matrices, avg_results, logger
 
         plt.tight_layout()
 
+        # logging
         if logger:
-            logger.log({f"confusion_matrix of {label_name}": wandb.Image(fig)})
+            logger.log({f"2x2 Confusion Matrix of {label_name}": wandb.Image(fig)})
+
+            logger.log({
+                f"Metrics/[{label_name}] Sensitivity": sens,
+                f"Metrics/[{label_name}] Specificity": spec,
+                f"Metrics/[{label_name}] ICBHI Score": (sens+spec)/2
+            })
 
         plt.close(fig)
-
-    if logger:
-        logger.log({
-                "Test/avg_sens_2label": avg_results["sensitivity"],
-                "Test/avg_spec_2label": avg_results["specificity"],
-                "Test/avg_score_2label": avg_results["ICBHI score"]
-            })
 
 def convert_to_multi_class(labels):
     """다중 레이블 -> 다중 클래스 변환
@@ -103,7 +101,6 @@ def get_confusion_matrix_for_multi_class(all_labels, all_preds):
         클래스별 메트릭 딕셔너리
     """
     
-    class_names = ['Normal', 'Crackle', 'Wheeze', 'Both']
     all_labels_cls = convert_to_multi_class(all_labels)
     all_preds_cls = convert_to_multi_class(all_preds)
 
@@ -123,9 +120,7 @@ def get_confusion_matrix_for_multi_class(all_labels, all_preds):
     spec = TN / (TN + FP + 1e-6)    # 특이도
 
     print("4x4 Confusion Matrix:\n", normalized_conf_matrix)
-    print(f"Sensitivity: {sens:.4f}")
-    print(f"Specificity: {spec:.4f}")
-    print(f"ICBHI Score: {(sens+spec)/2:.4f}")
+    print(f"[4Class] Sens: {sens:.4f}, Spec: {spec:.4f}, ICBHI Score: {(sens+spec)/2:.4f}")
 
     return normalized_conf_matrix, sens, spec
 
@@ -152,44 +147,14 @@ def log_confusion_matrix_for_multi_class(normalized_conf_matrix, sens, spec, log
 
     plt.tight_layout()
 
+    # logging
     if logger:
-        logger.log({"multiclass_confusion_matrix": wandb.Image(fig)})
+        logger.log({"Multi-Class 4x4 Confusion Matrix": wandb.Image(fig)})
 
         logger.log({
-            "Metrics/sensitivity_4class": sens,
-            "Metrics/specificity_4class": spec,
-            "Metrics/ICHBI_score_4class": (sens+spec)/2
+            "Metrics/[4Class] Sensitivity": sens,
+            "Metrics/[4Class] Specificity": spec,
+            "Metrics/[4Class] ICHBI Score": (sens+spec)/2
         })
 
     plt.close(fig)
-
-
-##### 사용하지 않음 #####
-def calculate_metrics(outputs: torch.Tensor, labels: torch.Tensor) -> Dict[str, float]:
-    """다중 레이블 분류 메트릭 계산
-    
-    Args:
-        outputs: 모델 출력
-        labels: 실제 레이블
-    
-    Returns:
-        메트릭 딕셔너리
-    """
-    # 예측값 변환
-    predictions = (torch.sigmoid(outputs) > 0.5).float()
-    
-    # NumPy로 변환
-    predictions = predictions.cpu().numpy()
-    labels = labels.cpu().numpy()
-    
-    # 메트릭 계산
-    metrics = {
-        'f1_macro': f1_score(labels, predictions, average='macro'),
-        'f1_micro': f1_score(labels, predictions, average='micro'),
-        'precision_macro': precision_score(labels, predictions, average='macro'),
-        'precision_micro': precision_score(labels, predictions, average='micro'),
-        'recall_macro': recall_score(labels, predictions, average='macro'),
-        'recall_micro': recall_score(labels, predictions, average='micro')
-    }
-    
-    return metrics

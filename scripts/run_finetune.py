@@ -148,7 +148,7 @@ def main():
     )
     
     # 학습 실행
-    history = trainer.train(
+    trainer.train(
         epochs=fnt_cfg.epochs - start_epoch,
         save_path=str(checkpoints_dir)
     )

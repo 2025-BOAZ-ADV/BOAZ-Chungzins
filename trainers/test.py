@@ -7,14 +7,13 @@ from typing import Dict, Tuple, Optional, Any, Union
 from sklearn.metrics import confusion_matrix, f1_score
 
 from models.classifier import LungSoundClassifier
-from utils.logger import WandbLogger
 
 class TestRunner:
     def __init__(
         self,
         model: LungSoundClassifier,
         device: torch.device,
-        test_loader: DataLoader
+        test_loader: DataLoader,
     ):
         self.model = model
         self.device = device
@@ -70,18 +69,9 @@ class TestRunner:
                 'ICBHI score': score
             }
 
-        # sens, spec, socre의 평균값 계산
-        avg_results = {
-            key: sum([results[lbl][key] for lbl in results]) / 2
-            for key in ['sensitivity', 'specificity', 'ICBHI score']
-        }
-
         # label별 성능 출력 (2x2 confusion matrix 기준)
         for lbl in ['Crackle', 'Wheeze']:
             r = results[lbl]
             print(f"  [{lbl}] Sens: {r['sensitivity']:.4f}, Spec: {r['specificity']:.4f}, ICBHI Score: {r['ICBHI score']:.4f}")
 
-        # label별 평균 성능 출력
-        print(f"  [Average] Sens: {avg_results['sensitivity']:.4f}, Spec: {avg_results['specificity']:.4f}, ICBHI Score: {avg_results['ICBHI score']:.4f}")
-
-        return avg_results, all_labels, all_preds
+        return all_labels, all_preds
