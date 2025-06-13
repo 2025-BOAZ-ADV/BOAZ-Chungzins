@@ -28,7 +28,8 @@ ADV/
 │   ├── run_eda.py         # EDA 실행 스크립트
 │   ├── run_finetune.py    # 파인튜닝 스크립트
 │   ├── run_pretrain.py    # 사전훈련 스크립트
-│   └── run_test.py        # 테스트 스크립트
+│   ├── run_test.py        # 테스트 스크립트
+│   └── run_TSNE.py        # t-SNE 실험 스크립트
 ├── trainers/              
 │   ├── finetune.py        # 파인튜닝 모듈
 │   ├── pretrain.py        # 사전훈련 모듈
@@ -36,12 +37,13 @@ ADV/
 ├── utils/                 
 │   ├── eda.py             # EDA 관련 함수
 │   ├── logger.py          # 로깅 함수
-│   └── metrics.py         # 평가 지표 함수
+│   ├── metrics.py         # 평가 지표 함수
+│   └── tnse.py            # t-SNE 수행 함수
 ├── wandb/                 # W&B 로그 (git에 업로드 X)
 ├── Multi_label_Moco_0607.ipynb # 원본 Jupyter 노트북
 ├── requirements.txt       # 패키지 목록
 ├── .env                   # 패키지 및 환경설정 파일
-├── .gitignore             # git 제외 파일 목록
+└── .gitignore             # git 제외 파일 목록
 ```
 
 ## 주요 코드 설명
