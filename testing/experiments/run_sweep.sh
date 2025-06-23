@@ -17,8 +17,8 @@ for ld in "${LD[@]}"; do
     echo "[${count}] $(TZ=Asia/Seoul date +%T) launch ld=$ld sec=$sec" | tee -a "$MASTER_LOG"
 
     # 현재 파라미터로 실험 수행
-    python testing/experiments/exp004.py --lambda_bce "$ld" --target_sec "$sec" \
-      >> "$MASTER_LOG" 2>&1
+    python -u testing/experiments/exp004.py --lambda_bce "$ld" --target_sec "$sec" \
+      2>&1 | tee -a "$MASTER_LOG"
 
     # 구분선 로깅
     printf '=%.0s' {1..60} >> "$MASTER_LOG"

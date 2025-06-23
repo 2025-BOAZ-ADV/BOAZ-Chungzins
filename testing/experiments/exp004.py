@@ -67,10 +67,10 @@ def main():
         - sec={cfg['target_sec']}
 
     """).strip()
-    print(log_line)
+    print(f"{log_line}\n")
 
     with open(os.path.join(out_dir, "run.log"), "a") as lf:
-        lf.write(log_line + "\n")
+        lf.write(log_line)
 
     # 5) 훈련 수행
     experiment = import_module(f'testing.experiments.exp003')
