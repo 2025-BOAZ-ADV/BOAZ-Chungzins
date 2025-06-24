@@ -1,0 +1,2 @@
+class MocoConfig:
+    pass

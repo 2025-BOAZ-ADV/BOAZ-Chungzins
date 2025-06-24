@@ -1,13 +1,12 @@
-from typing import List, Dict, Union, Any
+from testing.config.data.preprocess import PreprocessConfig
 
-class AugmentationConfig:
+class AugmentationConfig(PreprocessConfig):
     def __init__(
         self,
-        target_sr: int = 4000,
-        target_sec: Union[int, float] = 8,
-        augmentations: List[Dict[str, Any]] = None
+        augmentations = None
     ):
-        '''Augmentation 파라미터'''
+        super().__init__()
+
         if augmentations is not None:
             self.augmentations = augmentations
         else:
@@ -22,7 +21,7 @@ class AugmentationConfig:
                 {
                     'type': 'RandomCrop',
                     'params': {
-                        'crop_size': int(target_sr * target_sec)
+                        'crop_size': int(self.target_sr * self.target_sec)
                     }
                 },
                 {

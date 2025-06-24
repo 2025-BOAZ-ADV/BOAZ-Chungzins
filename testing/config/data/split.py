@@ -5,6 +5,8 @@ class DataSplitConfig:
         allow_val = False,
         val_ratio = 0.25
     ):
+        super().__init__()
+        
         # train data를 사전훈련 set, 파인튜닝 set으로 분할할 때, 사전훈련 set의 비율
         self.split_ratio = split_ratio
 

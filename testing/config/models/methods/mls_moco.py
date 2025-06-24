@@ -7,8 +7,10 @@ class MLSMocoConfig:
         dim_mlp = 128,       # projector q,k의 output z1,z2의 차원
         lambda_bce = 0.5,    # BCE loss에 곱해지는 lambda
         top_k = 10,          # positive pair의 개수
-        warmup_epochs = 1    # 초기에 InfoNCE loss만 사용하는 epoch, default: 10
+        warmup_epochs = 10   # 초기에 InfoNCE loss만 사용하는 epoch, default: 10
     ):
+        super().__init__()
+        
         self.K = K
         self.m = m
         self.T = T

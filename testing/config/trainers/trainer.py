@@ -1,18 +1,22 @@
-class PretrainConfig:
+class TrainerConfig:
     def __init__(
         self,
         batch_size = 128,
         num_workers = 4,
-        epochs = 2,           # default: 300
+        pretrain_epochs = 300,
+        finetune_epochs = 100,
         learning_rate = 0.03,
         weight_decay = 0.01,
         use_cache = False,    # 오디오를 mel spectrogram으로 변환하는 작업을 건너뛰고 캐시를 불러올지 설정
         save_cache = True     # 캐시 저장 여부 (오디오 파일명을 해시로 변환한 것이므로, 새로 저장 시 덮어쓰기가 됨)
     ):
+        super().__init__()
+        
         # 훈련 파라미터
         self.batch_size = batch_size
         self.num_workers = num_workers
-        self.epochs = epochs
+        self.pretrain_epochs = pretrain_epochs
+        self.finetune_epochs = finetune_epochs
         self.learning_rate = learning_rate
         self.weight_decay = weight_decay
 

@@ -6,11 +6,12 @@ class ClassifierConfig:
         dropout_rate = 0.5,
         freeze_encoder = True
     ):
+        import torch.nn as nn
+        super().__init__()
+
         self.layer_dims = layer_dims
         self.dropout_rate = dropout_rate
         self.freeze_encoder = freeze_encoder
-
-        import torch.nn as nn
 
         layers = []
         layers_info = f"Linear({in_dim} → "

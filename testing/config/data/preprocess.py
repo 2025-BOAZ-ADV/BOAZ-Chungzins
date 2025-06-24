@@ -7,6 +7,8 @@ class PreprocessConfig:
         hop_length = 512,
         n_mels = 128
     ):
+        super().__init__()
+        
         self.target_sec = target_sec
         self.target_sr = target_sr
         self.frame_size = frame_size
