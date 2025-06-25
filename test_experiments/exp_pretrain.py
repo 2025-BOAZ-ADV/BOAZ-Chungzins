@@ -39,7 +39,7 @@ def to_serializable_dict(d: dict):
 def log_results(cfg, tag, log_line):
     """실험에 사용한 파라미터 정보를 로깅"""
     project_root = Path(__file__).parent.parent
-    out_dir = project_root / 'experiments' / 'details' / f"{get_timestamp()}" / f"{tag}"
+    out_dir = project_root / 'test_experiments' / 'details' / f"{get_timestamp()}" / f"{tag}"
     out_dir.mkdir(parents=True, exist_ok=True)
 
     # 실험에 사용한 모든 파라미터들을 json 파일로 저장

@@ -1,5 +1,4 @@
 from typing import Literal
-from utils.logger import get_timestamp
 
 from test_config.data import AugmentationConfig, DataSplitConfig
 from test_config.models import ResnetConfig, TCNConfig, MLSMocoConfig, MocoConfig, ClassifierConfig
