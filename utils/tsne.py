@@ -23,11 +23,11 @@ def extract_features(encoder, dataloader, device, dim_mlp: Optional[int] = None)
         dim_prj = dim_mlp  # projection head의 출력 차원
         
         proj_head = nn.Sequential(
-                nn.Linear(dim_enc, dim_enc),
-                nn.BatchNorm1d(dim_enc),
-                nn.GELU(),
-                nn.Linear(dim_enc, dim_prj)
-            )
+            nn.Linear(dim_enc, dim_enc),
+            nn.BatchNorm1d(dim_enc),
+            nn.GELU(),
+            nn.Linear(dim_enc, dim_prj)
+        ).to(device)
     
     # feature 벡터 추출 (feature 벡터를 저차원으로 축소하고 싶으면 projector를 통과시킴)
     for mel, multi_label, _ in tqdm(dataloader, desc="Extracting features for t-SNE"):

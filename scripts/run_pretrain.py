@@ -89,7 +89,7 @@ def main():
         batch_size=ssl_cfg.batch_size,
         shuffle=False,      # 추후 개선할 부분, 이미 dataset이 한번 셔플된 상태
         num_workers=ssl_cfg.num_workers,
-        pin_memory=torch.cuda.is_available(),
+        pin_memory=True,
         drop_last=True      # 추후 개선할 부분
     )
     
@@ -128,7 +128,7 @@ def main():
     )
 
     # t-SNE 결과 저장 폴더
-    out_dir = project_root / 'tsne_results' / str(get_timestamp())
+    out_dir = project_root / 'pictures' / 'tsne_results' / str(get_timestamp())
 
     # t-SNE 시각화
     all_features, all_labels = extract_features(model.encoder_q, pretrain_loader, device, dim_mlp=ssl_cfg.dim_mlp)

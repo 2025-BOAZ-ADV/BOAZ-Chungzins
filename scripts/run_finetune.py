@@ -11,7 +11,7 @@ from data.dataset import CycleDataset
 from data.splitter import get_shuffled_filenames, split_cycledataset, create_dataloaders
 from models.classifier import create_classifier
 from trainers.finetune import FinetuneTrainer
-from utils.logger import WandbLogger
+from utils.logger import get_timestamp, WandbLogger
 from utils.tsne import extract_features, plot_tsne
 
 def parse_args():
@@ -154,9 +154,12 @@ def main():
         save_path=str(checkpoints_dir)
     )
 
+    # t-SNE 결과 저장 폴더
+    out_dir = project_root / 'pictures' / 'tsne_results' / str(get_timestamp())
+
     # t-SNE 시각화
     all_features, all_labels = extract_features(model.encoder, train_loader, device)
-    plot_tsne(all_features, all_labels, logger)
+    plot_tsne(all_features, all_labels, logger, save_dir=out_dir)
     
     # wandb 종료
     logger.finish()

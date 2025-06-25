@@ -81,8 +81,6 @@ class FinetuneTrainer:
             
             # progress bar 업데이트
             progress_bar.set_postfix({'Loss': loss.item()})
-
-        print(all_preds)
         
         epoch_loss = total_loss / len(self.train_loader)
         epoch_f1 = f1_score(all_labels, all_preds, average='macro')
