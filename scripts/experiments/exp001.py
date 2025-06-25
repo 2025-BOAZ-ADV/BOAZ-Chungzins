@@ -2,7 +2,6 @@
 
 """실험 001: Baseline 실험"""
 
-import torch
 import torch.nn as nn
 
 from config.base_config import BaseConfig
@@ -36,18 +35,18 @@ class SSLConfig:
         self.dim_mlp = 128        # projector q,k의 output z1,z2의 차원
         self.top_k = 10           # positive pair의 개수
         self.lambda_bce = 0.5     # BCE loss에 곱해지는 lambda
-        self.warmup_epochs = 3   # 초기에 InfoNCE loss만 사용하는 epoch, default: 10
+        self.warmup_epochs = 10   # 초기에 InfoNCE loss만 사용하는 epoch
 
         # 훈련 파라미터
         self.batch_size = 128
-        self.num_workers = 4
-        self.epochs = 8   # default: 300
+        self.num_workers = 8
+        self.epochs = 300
         self.learning_rate = 0.03
         self.weight_decay = 0.01
 
         # 캐시 사용 여부 (캐시 = ICBHI train data의 각 cycle의 mel spectrogram을 다음에 불러오기 쉽게 .pt 파일로 백업해놓은 것)
-        self.use_cache = True  # 오디오를 mel spectrogram으로 변환하는 작업을 건너뛰고 캐시를 불러올지 설정
-        self.save_cache = False  # 캐시 저장 여부 (오디오 파일명을 해시로 변환한 것이므로, 새로 저장 시 덮어쓰기가 됨)
+        self.use_cache = False  # 오디오를 mel spectrogram으로 변환하는 작업을 건너뛰고 캐시를 불러올지 설정
+        self.save_cache = True  # 캐시 저장 여부 (오디오 파일명을 해시로 변환한 것이므로, 새로 저장 시 덮어쓰기가 됨)
 
 # 파인튜닝 파라미터 설정
 class FinetuneConfig:
@@ -78,15 +77,15 @@ class FinetuneConfig:
         self.freeze_encoder = True
 
         # 훈련 파라미터
-        self.batch_size = 64
-        self.num_workers = 4
-        self.epochs = 5   # default: 100
+        self.batch_size = 128
+        self.num_workers = 8
+        self.epochs = 100
         self.learning_rate = 0.03
         self.weight_decay = 0.01
 
         # 캐시 사용 여부 (캐시 = ICBHI train data의 각 cycle의 mel spectrogram을 다음에 불러오기 쉽게 .pt 파일로 백업해놓은 것)
-        self.use_cache = True  # 오디오를 mel spectrogram으로 변환하는 작업을 건너뛰고 캐시를 불러올지 설정
-        self.save_cache = False  # 캐시 저장 여부 (오디오 파일명을 해시로 변환한 것이므로, 새로 저장 시 덮어쓰기가 됨)
+        self.use_cache = False  # 오디오를 mel spectrogram으로 변환하는 작업을 건너뛰고 캐시를 불러올지 설정
+        self.save_cache = True  # 캐시 저장 여부 (오디오 파일명을 해시로 변환한 것이므로, 새로 저장 시 덮어쓰기가 됨)
 
 # 실험 파라미터 설정
 class ExperimentConfig:
@@ -132,7 +131,7 @@ class ExperimentConfig:
         )
 
         # train data를 사전훈련 set, 파인튜닝 set으로 분할할 때, 사전훈련 set의 비율
-        self.split_ratio = 0.75
+        self.split_ratio = 0.8
 
         # 파인튜닝 set을 다시 train set, valid set으로 분할할 때, valid set의 비율
         self.allow_val = False

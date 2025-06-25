@@ -1,8 +1,7 @@
 import torch
 import torchaudio.transforms as T
 import random
-import math
-from typing import List, Dict, Any, Union
+from typing import List, Dict, Any
 
 class AugmentationBase:
     """증강 기법의 기본 클래스"""
@@ -88,7 +87,7 @@ class TimeStretch(AugmentationBase):
             return torch.nn.functional.pad(mel_stretched, (0, padding))
 
 class AugmentationComposer:
-    """여러 증강 기법을 조합"""
+    """증강 기법을 차례로 적용"""
     def __init__(self, augmentations: List[Dict[str, Any]]):
         """
         Args:
@@ -111,15 +110,23 @@ class AugmentationComposer:
                 self.augmentations.append(RandomNoise(**aug_params))
             elif aug_type == 'PitchShift':
                 self.augmentations.append(PitchShift(**aug_params))
+            elif aug_type == 'TimeStretch':
+                self.augmentations.append(TimeStretch(**aug_params))
     
     def __call__(self, mel: torch.Tensor) -> torch.Tensor:
-        """증강 적용"""
-        # 이미 정의된 증강들 중에서 랜덤하게 선택하여 적용
-        aug_indices = random.sample(range(len(self.augmentations)), 
-                                    k=random.randint(1, len(self.augmentations)))
+        """증강 기법을 차례로 적용하여 view 생성
         
+        Args:
+            mel (torch.Tensor): 입력 Mel spectrogram
+
+        Returns:
+            mel_aug (torch.Tensor): 증강이 적용된 view 
+        """
+        # 입력 Mel Spectrogram        
         mel_aug = mel.clone()
-        for idx in aug_indices:
+
+        # 순서대로 증강 기법 적용
+        for idx in range(len(self.augmentations)):
             mel_aug = self.augmentations[idx](mel_aug)
         
         return mel_aug
@@ -136,14 +143,10 @@ class AugmentationComposer:
         """
         return [self.__call__(mel) for _ in range(num_views)]
 
-def create_augmenter(target_sr: int, 
-                    target_sec: Union[int, float],
-                    augmentations: List[Dict[str, Any]]) -> AugmentationComposer:
+def create_augmenter(augmentations: List[Dict[str, Any]]) -> AugmentationComposer:
     """증강기 생성
     
     Args:
-        target_sr: 샘플링 레이트
-        target_sec: 오디오 길이
         augmentations: 증강 설정 리스트, dictionary로 구성된 리스트 (없으면 기본값 사용)
         예시: [
                 {'type': 'SpecAugment', 'params': {'time_mask_param': 0.8}},
@@ -154,49 +157,43 @@ def create_augmenter(target_sr: int,
         AugmentationComposer 인스턴스
     """
     if augmentations is None:
-        augmentations = [
-            {
-                'type': 'SpecAugment',
-                'params': {
-                    'time_mask_param': 0.8,
-                    'freq_mask_param': 0.8
-                }
-            },
-            {
-                'type': 'RandomCrop',
-                'params': {
-                    'crop_size': int(target_sr * target_sec)
-                }
-            },
-            {
-                'type': 'RandomNoise',
-                'params': {
-                    'noise_level': 0.005
-                }
-            },
-            {
-                'type': 'TimeStretch',
-                'params': {
-                    'min_rate': 0.8,
-                    'max_rate': 1.2
-                }
-            }
-        ]
-    
+        raise Exception("[Error] augmentations를 입력해주세요!")
+
     return AugmentationComposer(augmentations)
 
-def apply_spec_augment(mel_segment: torch.Tensor):
-    """
-    Mel spectrogram에 SpecAugment (frequency, time masking) 적용
-    여러 증강 버전을 반환
-    """
-    M = mel_segment.shape[-1]
-    F = mel_segment.shape[-2]
 
-    time_masking = T.TimeMasking(time_mask_param=int(M * 0.8))
-    freq_masking = T.FrequencyMasking(freq_mask_param=int(F * 0.8))
 
-    aug1 = freq_masking(time_masking(mel_segment.clone()))
-    aug2 = freq_masking(time_masking(mel_segment.clone()))
 
-    return aug1, aug2
+
+
+
+
+############# 안 쓰지만 혹시 몰라 남겨둔 코드 ################
+
+# def __call__(self, mel: torch.Tensor) -> torch.Tensor:
+#     """증강 적용"""
+#     # 이미 정의된 증강들 중에서 랜덤하게 선택하여 적용
+#     aug_indices = random.sample(range(len(self.augmentations)), 
+#                                 k=random.randint(1, len(self.augmentations)))
+    
+#     mel_aug = mel.clone()
+#     for idx in aug_indices:
+#         mel_aug = self.augmentations[idx](mel_aug)
+    
+#     return mel_aug
+
+# def apply_spec_augment(mel_segment: torch.Tensor):
+#     """
+#     Mel spectrogram에 SpecAugment (frequency, time masking) 적용
+#     여러 증강 버전을 반환
+#     """
+#     M = mel_segment.shape[-1]
+#     F = mel_segment.shape[-2]
+
+#     time_masking = T.TimeMasking(time_mask_param=int(M * 0.8))
+#     freq_masking = T.FrequencyMasking(freq_mask_param=int(F * 0.8))
+
+#     aug1 = freq_masking(time_masking(mel_segment.clone()))
+#     aug2 = freq_masking(time_masking(mel_segment.clone()))
+
+#     return aug1, aug2
