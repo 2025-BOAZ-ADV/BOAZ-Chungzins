@@ -4,6 +4,7 @@ import os
 import argparse
 from pathlib import Path
 import torch
+import torch.nn as nn
 from importlib import import_module
 
 from data.dataset import CycleDataset
@@ -14,32 +15,24 @@ from utils.metrics import get_confusion_matrix_for_multi_label, log_confusion_ma
 from utils.metrics import get_confusion_matrix_for_multi_class, log_confusion_matrix_for_multi_class
 from utils.tsne import extract_features, plot_tsne
 
-def parse_args():
-    parser = argparse.ArgumentParser(description='STEP 3. Test')
-    parser.add_argument('--exp', type=str, required=True,
-                        help='실험 설정 파일 (experiments 폴더 내 파일명)')
-    parser.add_argument('--ssl-checkpoint', type=str, required=True,
-                        help='SSL 모델 체크포인트 경로')
-    return parser.parse_args()
-
-def main():
-    args = parse_args()
+def main(cfg):
 
     # 현재 프로젝트 루트 디렉토리 설정
     project_root = Path(__file__).parent.parent
     
-    # 실험 설정 로드
-    exp_module = import_module(f'scripts.experiments.{args.exp}')
-    exp_cfg = exp_module.ExperimentConfig(str(args.exp))
-    ssl_cfg = exp_cfg.ssl
-    fnt_cfg = exp_cfg.finetune
+    # wandb 실험 이름
+    experiment_name = (
+        f"test-{cfg.batch_size}bs-{cfg.target_sr//1000}kHz-"
+        f"{cfg.num_layers}layer-{cfg.dropout_rate}dr-"
+        f"{get_timestamp()}"
+    )
     
     # wandb 초기화
     logger = WandbLogger(
-        project_name=exp_cfg.wandb_project,
-        experiment_name=exp_cfg.step3_experiment_name,
-        config=vars(fnt_cfg),
-        entity=exp_cfg.wandb_entity
+        project_name=cfg.wandb_project,
+        experiment_name=experiment_name,
+        config=vars(cfg),
+        entity=cfg.wandb_entity
     )
     
     # 디바이스 설정
@@ -57,31 +50,47 @@ def main():
         data_path=str(data_path),
         metadata_path=str(metadata_path),
         option="test",
-        target_sr=fnt_cfg.target_sr,
-        target_sec=fnt_cfg.target_sec,
-        frame_size=fnt_cfg.frame_size,
-        hop_length=fnt_cfg.hop_length,
-        n_mels=fnt_cfg.n_mels,
-        use_cache=exp_cfg.use_cache,
-        save_cache=exp_cfg.save_cache
+        target_sr=cfg.target_sr,
+        target_sec=cfg.target_sec,
+        frame_size=cfg.frame_size,
+        hop_length=cfg.hop_length,
+        n_mels=cfg.n_mels,
+        use_cache=cfg.use_cache,
+        save_cache=cfg.save_cache
     )
     
     # DataLoader 생성
     test_loader = torch.utils.data.DataLoader(
         test_dataset,
-        batch_size=fnt_cfg.batch_size,
+        batch_size=cfg.batch_size,
         shuffle=False,      # 추후 개선할 부분, 이미 dataset이 한번 셔플된 상태
-        num_workers=0 if device.type == 'cpu' else fnt_cfg.num_workers,
+        num_workers=0 if device.type == 'cpu' else cfg.num_workers,
         pin_memory=torch.cuda.is_available(),
         drop_last=True      # 추후 개선할 부분
     )
 
+    # 분류기 생성
+    layers = []
+    in_dim = cfg.in_dim
+
+    for out_dim in cfg.layer_dims:
+        layers += [
+            nn.Linear(in_dim, out_dim),
+            nn.BatchNorm1d(out_dim),
+            nn.GELU(),
+            nn.Dropout(cfg.dropout_rate)
+        ]
+        in_dim = out_dim
+
+    layers.append(nn.Linear(in_dim, 2))
+    classifier = nn.Sequential(*layers)
+
     # 모델 생성 (분류기까지 훈련된 것의 경로를 가져옴)
     model = create_classifier(
         checkpoint_path=args.ssl_checkpoint,
-        backbone_config=ssl_cfg,
-        classifier=fnt_cfg.classifier,
-        freeze_encoder=fnt_cfg.freeze_encoder
+        backbone_config=cfg,
+        classifier=classifier,
+        freeze_encoder=cfg.freeze_encoder
     ).to(device)
 
     # Trainer 생성 (내부에서 평가모드로 전환함)
@@ -102,7 +111,7 @@ def main():
     log_confusion_matrix_for_multi_class(conf_matrix, sens, spec, logger)
 
     # t-SNE 시각화
-    all_features, all_labels = extract_features(model.encoder, test_loader, device, dim_mlp=ssl_cfg.dim_mlp)
+    all_features, all_labels = extract_features(model.encoder, test_loader, device, dim_mlp=cfg.dim_mlp)
     plot_tsne(all_features, all_labels, logger, sens=sens, spec=spec, save_dir=out_dir)
     
     # wandb 종료

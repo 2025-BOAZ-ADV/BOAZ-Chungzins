@@ -24,10 +24,24 @@ def main(cfg):
     checkpoints_dir = project_root / 'checkpoints'
     checkpoints_dir.mkdir(parents=True, exist_ok=True)
     
+    # wandb 실험 이름
+    if cfg.method == 'mls':
+        experiment_name = (
+            f"prt-{cfg.batch_size}bs-{cfg.target_sr//1000}kHz-"
+            f"top{cfg.top_k}-{cfg.K}K-"
+            f"{cfg.dim_mlp}dim-{cfg.lambda_bce}ld-"
+            f"{get_timestamp()}"
+        )
+    elif cfg.method == 'moco':
+        experiment_name = (
+            f"prt-{cfg.batch_size}bs-{cfg.target_sr//1000}kHz-"
+            f"{get_timestamp()}"
+        )
+
     # wandb 초기화
     logger = WandbLogger(
         project_name=cfg.wandb_project,
-        experiment_name=cfg.step1_experiment_name,
+        experiment_name=experiment_name,
         config=vars(cfg),
         entity=cfg.wandb_entity
     )
@@ -106,7 +120,7 @@ def main(cfg):
     )
 
     # t-SNE 결과 저장 폴더
-    out_dir = project_root / 'tsne_results' / str(get_timestamp())
+    out_dir = project_root / 'pictures' / 'tsne_results' / str(get_timestamp())
 
     # t-SNE 시각화
     all_features, all_labels = extract_features(model.encoder_q, pretrain_loader, device, dim_mlp=cfg.dim_mlp)

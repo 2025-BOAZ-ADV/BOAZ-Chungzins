@@ -1,4 +1,4 @@
-from testing.config.data.preprocess import PreprocessConfig
+from test_config.data.preprocess import PreprocessConfig
 
 class AugmentationConfig(PreprocessConfig):
     def __init__(
